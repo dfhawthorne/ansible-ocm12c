@@ -1,0 +1,65 @@
+---
+# --------------------- Add Linux Groups
+
+- name:                 "Add Oracle Installation Group"
+  group: 
+    name:               "{{ oracle_user.install_group.name }}"
+    gid:                "{{ oracle_user.install_group.gid }}"
+    state:              present
+    system:             no
+
+- name:                 "Create ASM Linux Groups"
+  group: 
+    name:               "{{ item.value.name }}"
+    gid:                "{{ item.value.gid }}"
+    state:              present
+    system:             no
+  with_dict:            "{{ oracle_user.asm_groups }}"
+
+- name:                 "Create Database Linux Groups"
+  group: 
+    name:               "{{ item.value.name }}"
+    gid:                "{{ item.value.gid }}"
+    state:              present
+    system:             no
+  with_dict:            "{{ oracle_user.db_groups }}"
+
+# --------------------- Create Oracle User
+
+- name:                 "Load Oracle User Password"
+  include_vars:
+    file:               oracle_pw.yml
+    name:               oracle_user_pw
+
+- name:                 "Set default group and password for Oracle user"
+  user:
+    name:               oracle
+    append:             yes
+    comment:            "Oracle software owner"
+    password:           "{{ oracle_user_pw.password }}"
+    group:              "{{ oracle_user.install_group.name }}"
+    generate_ssh_key:   yes
+    groups:             "{{ oracle_user.install_group.name }}"
+    
+- name:                 "Add ASM Linux Groups to Oracle User"
+  user:
+    name:               oracle
+    append:             yes
+    groups:             "{{ item.value.name }}"
+  with_dict:            "{{ oracle_user.asm_groups }}"
+    
+- name:                 "Add Database Linux Groups to Oracle User"
+  user:
+    name:               oracle
+    append:             yes
+    groups:             "{{ item.value.name }}"
+  with_dict:            "{{ oracle_user.db_groups }}"
+
+- name:                 "Set authorized key from file"
+  expect:
+    command:            ssh-copy-id "{{ ansible_fqdn }}"
+    responses:
+      "Are you sure you want to continue connecting": yes
+  become:               yes
+  become_user:          oracle
+...

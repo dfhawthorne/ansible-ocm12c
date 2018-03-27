@@ -1,0 +1,30 @@
+---
+# vars file for oracle_user
+# ------------------------------------------------------------------------------
+# Attributes for the ORACLE user on Linux
+# ------------------------------------------------------------------------------
+"oracle_user":
+  # ------------------- Installation Linux Groups
+  "install_group":
+    "name":             "oinstall"
+    "gid":              54321
+  # ------------------- ASM Linux Groups
+  "asm_groups":
+    "OSDBA":
+      "name":           "asmdba"
+      "gid":            54327
+    "OSOPER":
+      "name":           "asmoper"
+      "gid":            54328
+    "OSASM":
+      "name":           "asmadmin"
+      "gid":            54329
+  # ------------------- Database Linux Groups
+  "db_groups":
+    "DBA_GROUP":
+      "name":           "dba"
+      "gid":            54322
+    "OPER_GROUP":
+      "name":           "oper"
+      "gid":            54323
+...

@@ -1,0 +1,7 @@
+---
+# vars file for oracle_gi
+"oracle_gi":
+  "inventory_location": "/opt/app/oraInventory"
+  "oracle_base":        "/opt/app/grid"
+  "oracle_home":        "/opt/app/12.1.0/grid"
+...

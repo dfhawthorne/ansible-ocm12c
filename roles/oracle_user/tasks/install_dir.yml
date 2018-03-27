@@ -1,0 +1,13 @@
+- name: Creating the Oracle Home and Oracle Base Directory
+  file:
+    path: /opt/{{ item }}
+    owner: oracle
+    group: oinstall
+    mode: 0755
+    state: directory
+    recurse: yes
+  with_items:
+    - app/12.1.0/grid
+    - app/grid
+    - app/oracle
+  

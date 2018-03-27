@@ -1,0 +1,31 @@
+---
+- name: Prepare REDFERN Cluster for Oracle GI 12.1 installation (Networking)
+  hosts: redfern1.yaocm.id.au
+  become: true
+  
+  tasks:
+  - name: install needed network manager libs
+    yum:
+      name: '{{ item }}'
+      state: installed
+    with_items:
+      - NetworkManager-glib
+
+  - name: Configure Public LAN Interface for REDFERN RAC
+    nmcli:
+      conn_name: eth0
+      dns4:      "192.168.1.252 192.168.1.1"
+      gw4:       "192.168.1.1"
+      ip4:       "192.168.1.140/24"
+      mtu:       1500
+      state:     present
+      type:      ethernet
+      
+  - name: Private LAN Interface
+    nmcli:
+      conn_name: eth1
+      mtu:       9000
+      state:     present
+      type:      ethernet
+      
+...

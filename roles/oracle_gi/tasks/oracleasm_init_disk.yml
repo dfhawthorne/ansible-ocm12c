@@ -1,0 +1,29 @@
+# ==============================================================================
+# Initialise a disk device only if it is not already an ASM disk
+# ==============================================================================
+- name:         "Query status of disk {{ oasm_disk.dev }}1"
+  command:      /usr/sbin/oracleasm querydisk "{{ oasm_disk.dev }}1"
+  changed_when: false
+  failed_when:  false
+  no_log:       true
+  register:     oasm_disk_status
+
+- debug:
+    var:        oasm_disk_status
+    verbosity:  1
+
+- name:         "Ensure that there is one partition that occupies whole disk {{ oasm_disk.dev }}"
+  parted:
+    device:     "{{ oasm_disk.dev }}"
+    number:     1
+    state:      present
+    label:      msdos
+    part_type:  primary
+    part_start: 0%
+    part_end:   100%
+  become:       yes
+  become_user:  root
+
+- name:         "Initialize {{ oasm_disk.dev }}1 as {{ oasm_disk.disk }}"
+  command:      /usr/sbin/oracleasm createdisk "{{ oasm_disk.disk }}" "{{ oasm_disk.dev }}1"
+  when:         oasm_disk_status.stdout_lines[0] is match("Device .* is not marked as an ASM disk")

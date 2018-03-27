@@ -1,0 +1,4 @@
+- name: Install Oracle 12.1 pre-installation RPM
+  yum:
+    name: oracle-rdbms-server-12cR1-preinstall
+    state: present

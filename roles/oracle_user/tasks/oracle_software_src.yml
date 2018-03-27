@@ -1,0 +1,17 @@
+- name:     Install NFS Utilities Software
+  yum:
+    name:   nfs-utils
+    state:  present
+        
+- name:     Create Mount Point for Oracle Installation Software
+  file:
+    path:   /opt/share/Software
+    state:  directory
+
+- name:     Mount NFS Share for Oracle Installation Software
+  mount:
+    path:   /opt/share/Software
+    src:    narrabri.yaocm.id.au:/data/Software
+    fstype: nfs4
+    opts:   ro,bg,hard,nointr,rsize=32768,wsize=32768,tcp,vers=4,timeo=600
+    state:  mounted

@@ -1,0 +1,57 @@
+---
+# =============================================================================
+# Install Oracle GI 12.1.0.2 Software Only:
+# (1) Create response file for silent installation
+# (2) Install Oracle GI 12.1.0.2 Software Only in Silent Mode
+# (3) Run root scripts
+# =============================================================================
+- set_fact:
+    response_file: "{{ oracle_gi.oracle_base }}/grid_install.rsp"
+    installer_loc: "/opt/share/Software/grid/linuxamd64_12102/grid"
+
+- name:            Create response file for silent installation
+  template:
+    src:           "grid_install.rsp"
+    dest:          "{{ response_file }}"
+
+- name:            Install Oracle GI 12.1.0.2 Software Only in Silent Mode
+  command:         "{{ installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
+  args:
+    chdir:         "{{ installer_loc }}"
+    creates:       "{{ oracle_gi.oracle_home }}/*"
+  register:        gi_sw_install_result
+  
+- debug:
+    var:           gi_sw_install_result.stdout_lines
+    verbosity:     0
+
+- name:            Run root scripts after installation of Oracle GI 12.1.0.2 Software
+  block:
+  - name:          Verifies orainstRoot.sh exists
+    stat:
+      path:        "{{ oracle_gi.inventory_location }}/orainstRoot.sh"
+    register:      orainstRoot_stat
+
+  - name:          Run orainstRoot.sh after Oracle GI 12.1.0.2 Software Installation
+    command:       "{{ oracle_gi.inventory_location }}/orainstRoot.sh"
+    register:      orainstRoot
+    when:          orainstRoot_stat.stat.exists
+  
+  - debug:
+      var:         orainstRoot.stdout_lines
+      verbosity:   0
+    when:          orainstRoot is defined
+
+  - name:          Run root.sh after Oracle GI 12.1.0.2 Software Installation
+    command:       "{{ oracle_gi.oracle_home }}/root.sh"
+    register:      root_sh
+
+  - debug:
+      var:         root_sh.stdout_lines
+    when:          root_sh is defined
+  become:          yes
+  become_user:     root
+  when:
+  - gi_sw_install_result.changed
+  - gi_sw_install_result|succeeded
+...
