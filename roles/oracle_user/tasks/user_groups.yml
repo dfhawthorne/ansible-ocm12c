@@ -31,35 +31,26 @@
     file:               oracle_pw.yml
     name:               oracle_user_pw
 
+- set_fact:
+    oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('*.*.name')) }}"
+
+- debug:
+    var:                oracle_groups
+    verbosity:          1
+
 - name:                 "Set default group and password for Oracle user"
   user:
     name:               oracle
-    append:             yes
     comment:            "Oracle software owner"
     password:           "{{ oracle_user_pw.password }}"
     group:              "{{ oracle_user.install_group.name }}"
-    generate_ssh_key:   yes
-    groups:             "{{ oracle_user.install_group.name }}"
+    groups:             "{{ oracle_user.install_group.name }}, {{ oracle_groups }}"
     
-- name:                 "Add ASM Linux Groups to Oracle User"
-  user:
-    name:               oracle
-    append:             yes
-    groups:             "{{ item.value.name }}"
-  with_dict:            "{{ oracle_user.asm_groups }}"
-    
-- name:                 "Add Database Linux Groups to Oracle User"
-  user:
-    name:               oracle
-    append:             yes
-    groups:             "{{ item.value.name }}"
-  with_dict:            "{{ oracle_user.db_groups }}"
+# --------------------- Generate SSH keys on first node only 
 
-- name:                 "Set authorized key from file"
-  expect:
-    command:            ssh-copy-id "{{ ansible_fqdn }}"
-    responses:
-      "Are you sure you want to continue connecting": yes
-  become:               yes
-  become_user:          oracle
+- name:                 "Generate SSH keys for first node only"
+  user:
+    name:               oracle
+    generate_ssh_key:   yes
+  when:                 "{{ first_node }}"
 ...
