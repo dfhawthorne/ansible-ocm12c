@@ -1,0 +1,61 @@
+---
+# ------------------------------------------------------------------------------
+# Install the following modules on all systems:
+# (1) nscd for DNS caching
+# (2) pexpect for the Ansible pexpect module
+# ------------------------------------------------------------------------------
+
+# ---------------- Install NSCD
+
+- name:            "Install DNS caching module (nscd) on Ubuntu"
+  apt:
+    name:          nscd
+    state:         latest
+  become:          yes
+  become_user:     root
+  when:            ansible_distribution == "Ubuntu"
+
+- name:            "Install DNS caching module (nscd) on OEL"
+  yum:
+    name:          nscd
+    state:         latest
+  become:          yes
+  become_user:     root
+  when:            ansible_distribution == "OracleLinux"
+
+# ---------------- Install PEXPECT
+
+- name:            "install Python module PEXPECT on Ubuntu systems"
+  apt:
+    name:          python-pexpect
+    state:         latest
+  become:          yes
+  become_user:     root
+  when:            ansible_distribution == "Ubuntu"
+
+- name:            "Install Python module PEXPECT on OEL systems"
+  block:
+
+  - name:          "Ensure old version of PEXPECT is not installed on OEL systems"
+    yum:
+      name:        pexpect
+      state:       absent
+
+  - name:          "Install SETUP_TOOLS for EASY_INSTALL on OEL systems"
+    yum:
+      name:        python-setuptools
+      state:       latest
+  - name:          "Install PIP on OEL systems"
+    easy_install:
+      name:        pip
+      state:       latest
+
+  - name:          "Use PIP to install PEXPECT on OEL systems"
+    pip:
+      name:        pexpect
+      state:       latest
+  become:          yes
+  become_user:     root
+  when:            ansible_distribution == "OracleLinux"
+
+...
