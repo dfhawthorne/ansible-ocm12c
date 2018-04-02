@@ -44,13 +44,48 @@
     comment:            "Oracle software owner"
     password:           "{{ oracle_user_pw.password }}"
     group:              "{{ oracle_user.install_group.name }}"
-    groups:             "{{ oracle_user.install_group.name }}, {{ oracle_groups }}"
+    groups:             "{{ oracle_user.install_group.name }},{{ oracle_groups }}"
     
 # --------------------- Generate SSH keys on first node only 
 
-- name:                 "Generate SSH keys for first node only"
-  user:
-    name:               oracle
-    generate_ssh_key:   yes
-  when:                 "{{ first_node }}"
+- name:                 "Generate and copy SSH keys for first node only"
+  block:
+  
+  - name:               "Generate SSH keys for first node only"
+    user:
+      name:             oracle
+      generate_ssh_key: yes
+
+  - name:               "Retrieve SSH Public Key from first node only"
+    fetch:
+      src:              /home/oracle/.ssh/id_rsa.pub
+      dest:             /etc/ansible/keys/redfern/
+      flat:             yes
+
+  - name:               "Retrieve SSH Private Key from first node only"
+    fetch:
+      src:              /home/oracle/.ssh/id_rsa
+      dest:             /etc/ansible/keys/redfern/
+      flat:             yes
+
+  when:                 first_node
+
+# --------------------- Add public key to authorized keys
+
+- name:                 "Add public key to authorized keys"
+  authorized_key:
+    user:               oracle
+    state:              present
+    key:                "{{ lookup('file', '/etc/ansible/keys/redfern/id_rsa.pub') }}"
+
+# --------------------- Add current host to known hosts
+
+- name:                 "Add current host to known hosts"
+  expect:
+    command:            /bin/ssh-copy-id "{{ item }}" -f
+    responses:
+      'Are you sure you want to continue connecting \(yes/no\)\? ': 'yes'
+  loop:                 "{{ groups['oracle_rac'] }}"
+  become:               yes
+  become_user:          oracle
 ...

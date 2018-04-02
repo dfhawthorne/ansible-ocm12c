@@ -1,5 +1,5 @@
 ---
-- hosts:	redfern1.yaocm.id.au
+- hosts:	oracle_rac
   roles:
     - common
     - oracle_user
