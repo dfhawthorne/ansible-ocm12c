@@ -81,11 +81,23 @@
 # --------------------- Add current host to known hosts
 
 - name:                 "Add current host to known hosts"
-  expect:
-    command:            /bin/ssh-copy-id "{{ item }}" -f
-    responses:
-      'Are you sure you want to continue connecting \(yes/no\)\? ': 'yes'
-  loop:                 "{{ groups['oracle_rac'] }}"
+  block:
+
+  - name:               "Add current long host name to known hosts"
+    expect:
+      command:          /bin/ssh-copy-id "{{ item }}" -f
+      responses:
+        'Are you sure you want to continue connecting \(yes/no\)\? ': 'yes'
+    loop:               "{{ groups['oracle_rac'] }}"
+
+  - name:               "Add current short host name to known hosts"
+    expect:
+      command:          /bin/ssh-copy-id "{{ hostvars[item].ansible_hostname }}" -f
+      responses:
+        'Are you sure you want to continue connecting \(yes/no\)\? ': 'yes'
+    loop:               "{{ groups['oracle_rac'] }}"
+
   become:               yes
   become_user:          oracle
+  tags:                 user_equivalency
 ...
