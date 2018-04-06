@@ -4,6 +4,8 @@
 # (1) Install Oracle ASMLib Driver
 # (2) Configure Oracle ASMLib Driver
 # (3) Install Oracle GI 12.1.0.2 Software Only
+# (4) Patch GI Home to PSU 20180116
+# (5) Install CRS
 # ==============================================================================
 
 - name:		    Install and configure Oracle ASMLib driver
@@ -16,6 +18,10 @@
 - name:             Install Oracle GI 12.1.0.2 Software Only
   block:
     - import_tasks: install_gi_sw.yml
+    - import_tasks: apply_psu_121020_20180116.yml
+      tags:         apply_psu
+    - import_tasks: crs_inst.yml
+      tags:         crs_inst
   become:           yes
   become_user:      oracle
   tags:             install_gi_sw

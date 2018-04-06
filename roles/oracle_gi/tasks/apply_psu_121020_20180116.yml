@@ -1,0 +1,86 @@
+---
+# ------------------------------------------------------------------------------
+# Apply PSU 12.1.0.2.20180116 to the Grid Infrastructure (GI) only
+# ------------------------------------------------------------------------------
+
+# --------------------- Set Facts for Patching
+
+- name:                 "Set Facts for Patching"
+  set_fact:
+    patch_num:          '27010872'
+    patching_dir:       "{{ oracle_gi.oracle_base }}/patching"
+    opatch_cmd:         "{{ oracle_gi.oracle_home }}/OPatch/opatch"
+    opatchauto_cmd:     "{{ oracle_gi.oracle_home }}/OPatch/opatchauto"
+    min_opatch_vers:    '12.1.0.1.7'
+
+- set_fact:
+    patch_loc:          "{{ patching_dir }}/{{ patch_num }}"
+
+# --------------------- Creates patching directory
+
+- name:                 "Creates patching directory"
+  file:                
+    path:               "{{ patching_dir }}"
+    state:              directory
+    owner:              oracle
+    group:              "{{ oracle_user.install_group.name }}"
+    mode:               0770
+
+# --------------------- Check version of OPatch
+
+- name:                 "Get current version of OPatch"
+  command:              "{{ opatch_cmd }} version"
+  register:             opatch_vers_data
+  changed_when:         false
+
+- set_fact:
+    opatch_version:    "{{ opatch_vers_data.stdout_lines[0].split(' ')[2] }}"
+
+# -------------------- Install latest vserion of OPatch, if required
+
+- name:                 "Install latest version of OPatch (P6880880)"
+  unarchive:
+    copy:               yes
+    dest:               "{{ oracle_gi.oracle_home }}"
+    owner:              oracle
+    group:              "{{ oracle_user.install_group.name }}"
+    src:                p6880880_122010_Linux-x86-64.zip
+  when:                 opatch_version is version(min_opatch_vers, operator='lt', strict=false)
+
+# --------------------- Unpack latest PSU 121020_20180116 (P27010872)
+
+- name:                 "Unpack latest PSU 121020_20180116 (P27010872)"
+  unarchive:
+    copy:               yes
+    creates:            "{{ patch_loc }}"
+    dest:               "{{ patching_dir }}"
+    owner:              oracle
+    group:              "{{ oracle_user.install_group.name }}"
+    src:                p27010872_121020_Linux-x86-64.zip
+
+# --------------------- Validation of Oracle Inventory
+
+- name:                 "Validation of Oracle Inventory"
+  command:              "{{ opatch_cmd }} lsinventory -detail -oh {{ oracle_gi.oracle_home }}"
+  changed_when:         false
+
+# --------------------- One-off Patch Conflict Detection
+
+- name:                 "One-off Patch Conflict Detection"
+  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.oracle_home }} -analyze"
+  changed_when:         false
+  register:             opatch_analyze
+  become:               yes
+  become_user:          root
+
+# --------------------- Patch Grid Infrastructure (GI) Home
+
+- name:                 "Patch Grid Infrastructure (GI) Home"
+  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.oracle_home }}"
+  become:               yes
+  become_user:          root
+  when:
+  - opatch_analyze.stdout is search('==Following patches were SUCCESSFULLY analyzed to be applied:')
+  - opatch_analyze.stdout is not search('==Following patches were SKIPPED:')
+
+...

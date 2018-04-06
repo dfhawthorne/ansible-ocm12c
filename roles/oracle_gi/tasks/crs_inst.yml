@@ -1,0 +1,28 @@
+---
+# ------------------------------------------------------------------------------
+# Checks the cluster is ready for the installation of Grid Infrastructure (GI)
+# ------------------------------------------------------------------------------
+
+- name:                 "Checks the cluster is ready for the installation of Grid Infrastructure (GI)"
+  block:
+  
+  - set_fact:
+      installer_loc:    "/opt/share/Software/grid/linuxamd64_12102/grid"
+
+  - name:               "Run Verification Checks for CRS Installation"
+    command:            "{{ installer_loc }}/runcluvfy.sh stage -pre crsinst -n {{ ansible_hostname }}"
+    failed_when:        false
+    changed_when:       false
+    no_log:             true
+    register:           cluvfy_status
+
+  - debug:
+      var:              cluvfy_status.stdout_lines
+      verbosity:        0
+#   when:               cluvfy_status.failed
+    
+  become:               yes
+  become_user:          oracle
+  when:                 first_node
+  tags:                 crsinst_pre
+...
