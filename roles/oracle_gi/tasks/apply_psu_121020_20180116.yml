@@ -24,7 +24,6 @@
     state:              directory
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
-    mode:               0770
 
 # --------------------- Check version of OPatch
 

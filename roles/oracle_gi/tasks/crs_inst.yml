@@ -7,19 +7,18 @@
   block:
   
   - set_fact:
-      installer_loc:    "/opt/share/Software/grid/linuxamd64_12102/grid"
+      installer_loc:    "{{ software_nfs_loc }}/grid/linuxamd64_12102/grid"
 
   - name:               "Run Verification Checks for CRS Installation"
     command:            "{{ installer_loc }}/runcluvfy.sh stage -pre crsinst -n {{ ansible_hostname }}"
-    failed_when:        false
     changed_when:       false
+    failed_when:        false
     no_log:             true
     register:           cluvfy_status
 
   - debug:
       var:              cluvfy_status.stdout_lines
       verbosity:        0
-#   when:               cluvfy_status.failed
     
   become:               yes
   become_user:          oracle

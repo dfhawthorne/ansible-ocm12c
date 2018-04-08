@@ -1,0 +1,9 @@
+---
+# ------------------------------------------------------------------------------# System-wide variable definitions
+# ------------------------------------------------------------------------------
+
+# --------------------- Mount point for shared software location on home network
+
+ 
+"software_nfs_loc":     "/opt/share/Software"
+...

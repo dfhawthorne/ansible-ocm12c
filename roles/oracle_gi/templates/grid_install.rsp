@@ -105,7 +105,7 @@ SELECTED_LANGUAGES=en
 #   - HA_SWONLY  : To install clusterware files only (can be configured for stand 
 #                  alone server later. This is only supported on Windows.)
 #-------------------------------------------------------------------------------
-oracle.install.option=CRS_SWONLY
+oracle.install.option={{ install_option }}
 
 #-------------------------------------------------------------------------------
 # Specify the complete path of the Oracle Base.
