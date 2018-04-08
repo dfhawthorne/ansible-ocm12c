@@ -1,38 +1,60 @@
-Role Name
-=========
+ORACLE_USER
+===========
 
-A brief description of the role goes here.
+This role maintains the oracle user and its associated groups. Also, the basic directory structure is defined.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+* `oracle_user` is a dictionary which has the following three (3) keys:
+  1. `install_group` (Installation Linux Group) which is a dictionary which has the following two (2) keys:
+     1. `name` = name of Linux group
+     1. `gid` = Linux group ID
+  1. `asm_groups` (ASM Linux Groups) which is also a dictionary which has the following three (3) keys:
+     1. `OSDBA`
+     1. `OSOPER`
+     1. `OSASM`
+     * Each of these is a dictionary which has the following two (2) keys:
+       * `name` = name of Linux group
+       * `gid` = Linux group ID
+  1. `db_groups` (Database Linux Groups) which is also a dictionary which has the following two (2) keys:
+     1. `DBA_GROUP`
+     1. `OPER_GROUP`
+     * Each of these is a dictionary which has the following two (2) keys:
+       * `name` = name of Linux group
+       * `gid` = Linux group ID
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+An example of how to use this role is:
+```yml
+- hosts: servers
+  roles:
+  - oracle_user
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+Incomplete Repository
+---------------------
+
+This role is missing one (1) file from the repository:
+1. roles/oracle_user/vars/oracle_pw.yml
+
+The file contains a password (albeit in a hashed format).
 
 License
 -------
 
 BSD
 
-Author Information
-------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
