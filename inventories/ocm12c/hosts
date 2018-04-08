@@ -51,5 +51,5 @@ auburn.yaocm.id.au
 # Oracle RAC Nodes
 
 [oracle_rac]
-redfern1.yaocm.id.au first_node=True
+redfern1.yaocm.id.au
 # redfern2.yaocm.id.au first_node=False

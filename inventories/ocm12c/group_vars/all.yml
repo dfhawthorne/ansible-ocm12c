@@ -4,6 +4,9 @@
 
 # --------------------- Mount point for shared software location on home network
 
- 
 "software_nfs_loc":     "/opt/share/Software"
+
+# --------------------- Default value for first_node of a cluster
+
+"first_node":           false
 ...

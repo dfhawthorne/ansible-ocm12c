@@ -1,3 +1,15 @@
+---
+# ------------------------------------------------------------------------------
+# Server specific variables for REDFERN1.YAOCM.ID.AU
+# ------------------------------------------------------------------------------
+
+# --------------------- This is the first node of the REDFERN cluster
+
+"first_node":           true
+
+# --------------------- Interface details
+
 "interface":
   "public":             "192.168.1.140:eth0:1"
   "private":            "192.168.2.140:eth1:2"
+...
