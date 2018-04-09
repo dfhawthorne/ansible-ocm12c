@@ -2,58 +2,59 @@
 # ============================================================================
 # Ensure that the Oracle ASMLib driver is configured and enabled
 #   User should be 'oracle'
-#   Group should be 'asmadmin'
+#   Group should be '{{ oracle_user.asm_groups.OASM.name }}'
 # ============================================================================
 
-- name:         Get Oracle ASMLib Driver Configuration
-  command:      /usr/sbin/oracleasm configure
-  register:     oasm_config
-  changed_when: false
+- name:                 "Get Oracle ASMLib Driver Configuration"
+  command:              "{{ oracleasm_cmd }} configure"
+  register:             oasm_config
+  changed_when:         false
 
 - debug:
-    var:        oasm_config
-    verbosity:  1
+    var:                oasm_config.stdout_lines
+    verbosity:          1
 
-- name:         Set Owner for Oracle ASMLib Driver
-  command:      /usr/sbin/oracleasm configure -u oracle
-  when:         oasm_config.stdout_lines[1] != "ORACLEASM_UID=oracle"
+- name:                 "Set Owner for Oracle ASMLib Driver"
+  command:              "{{ oracleasm_cmd }} configure -u oracle"
+  when:                 oasm_config.stdout_lines[1] != "ORACLEASM_UID=oracle"
 
-- name:         Set Group for Oracle ASMLib Driver
-  command:      /usr/sbin/oracleasm configure -g asmadmin
-  when:         oasm_config.stdout_lines[2] != "ORACLEASM_GID=asmadmin"
+- name:                 "Set Group for Oracle ASMLib Driver"
+  command:              "{{ oracleasm_cmd }} configure -g {{ oracle_user.asm_groups.OASM.name }}"
+  when:                 oasm_config.stdout_lines[2] != "ORACLEASM_GID={{ oracle_user.asm_groups.OASM.name }}"
 
-- name:         Enable Oracle ASMLib Driver
-  command:      /usr/sbin/oracleasm configure -e
-  when:         oasm_config.stdout_lines[0] == "ORACLEASM_ENABLED=false"
+- name:                 "Enable Oracle ASMLib Driver"
+  command:              "{{ oracleasm_cmd }} configure -e"
+  when:                 oasm_config.stdout_lines[0] == "ORACLEASM_ENABLED=false"
 
 # ============================================================================
 # Ensure that the Oracle ASMLib Driver is initialized and loaded
 # ============================================================================
 
-- name:         Check Oracle ASMLib Driver Status
-  command:      /usr/sbin/oracleasm status
-  register:     oasm_status
-  changed_when: false
-  failed_when:  false
-  no_log:       true
+- name:                 "Check Oracle ASMLib Driver Status"
+  command:              "{{ oracleasm_cmd }} status"
+  register:             oasm_status
+  changed_when:         false
+  failed_when:          false
+  no_log:               true
 
 - debug:
-    var:         oasm_status
-    verbosity:   1
+    var:                oasm_status.stdout_lines
+    verbosity:          1
 
-- name:         Load and initialize Oracle ASMLib Driver
-  command:      /usr/sbin/oracleasm init
-  when:         oasm_status.stdout_lines[0] is match("Checking if ASM is loaded. no")
+- name:                 "Load and initialize Oracle ASMLib Driver"
+  command:              "{{ oracleasm_cmd }} init"
+  when:                 oasm_status.stdout_lines[0] is match("Checking if ASM is loaded. no")
 
-- name:         Verify Oracle ASMLib Driver is loaded and initialized
-  command:      /usr/sbin/oracleasm status
-  register:     oasm_status
-  changed_when: false
+- name:                 "Verify Oracle ASMLib Driver is loaded and initialized"
+  command:              "{{ oracleasm_cmd }} status"
+  register:             oasm_status
+  changed_when:         false
 
 # ============================================================================
 # Initialize all required disk devices with the Oracle ASMLib driver
 # ============================================================================
-- include_tasks: oracleasm_init_disk.yml
+
+- include_tasks:        oracleasm_init_disk.yml
   with_items:
   - { dev: /dev/xvdd, disk: DATA }
   - { dev: /dev/xvde, disk: FRA  }
@@ -61,5 +62,6 @@
   - { dev: /dev/xvdg, disk: REDO2 }
   - { dev: /dev/xvdh, disk: VOTE }
   loop_control:
-    loop_var:    oasm_disk
+    loop_var:           oasm_disk
+  tags:                 oracleasm_init_disk
 ...
