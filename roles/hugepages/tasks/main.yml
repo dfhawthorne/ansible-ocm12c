@@ -1,0 +1,34 @@
+---
+# tasks file for hugepages
+# ------------------------------------------------------------------------------
+# Sets up Huge Pages for Oracle Enterprise Linux (OEL)
+# ------------------------------------------------------------------------------
+
+# --------------------- Use a block to run only for OEL
+
+- name:                 "Sets up Huge Pages for Oracle Enterprise Linux"
+  block:
+
+  - name:               "Get Transparent Huge Pages setting"
+    command:            cat /sys/kernel/mm/transparent_hugepage/enabled
+    register:           transparent_hugepage
+    changed_when:       false
+
+  - name:               "Validate Transparent Huge Pages is disabled"
+    fail:
+      msg:              "Transparent Huge Pages is enabled"
+    when:               transparent_hugepage.stdout_lines[0] != 'always madvise [never]'
+
+  - name:               "Set number of Huge Pages"
+    sysctl:
+      name:             "vm.nr_hugepages"
+      state:            present
+      value:            "{{ num_huge_pages }}"
+      reload:           yes
+    when:               num_huge_pages is defined
+
+  when:                 ansible_distribution == 'OracleLinux'
+  become:               yes
+  become_user:          root
+  tags:                 hugepages
+...

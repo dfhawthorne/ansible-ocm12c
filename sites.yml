@@ -2,6 +2,7 @@
 - hosts:	oracle_rac
   roles:
     - common
+    - hugepages
     - oracle_user
     - oracle_gi
 ...

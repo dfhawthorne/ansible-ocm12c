@@ -7,6 +7,10 @@
 
 "first_node":           true
 
+# --------------------- Set number of required Huge Pages
+
+"num_huge_pages":       1536
+
 # --------------------- Interface details
 
 "interface":
