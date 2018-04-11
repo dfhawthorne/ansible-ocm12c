@@ -7,17 +7,6 @@
 - name:                 "Initialise a disk device only if it is not already an ASM disk"
   block:
 
-  - name:               "Query status of disk {{ oasm_disk.dev }}1"
-    command:            "{{ oracleasm_cmd }} querydisk {{ oasm_disk.dev }}1"
-    changed_when:       false
-    failed_when:        false
-    no_log:             true
-    register:           oasm_disk_status
-
-  - debug:
-      var:              oasm_disk_status.stdout_lines
-      verbosity:        1
-
   - name:               "Ensure that there is one partition that occupies whole disk {{ oasm_disk.dev }}"
     parted:
       device:           "{{ oasm_disk.dev }}"
@@ -27,6 +16,17 @@
       part_type:        primary
       part_start:       0%
       part_end:         100%
+
+  - name:               "Query status of disk {{ oasm_disk.dev }}1"
+    command:            "{{ oracleasm_cmd }} querydisk {{ oasm_disk.dev }}1"
+    changed_when:       false
+    failed_when:        false
+    no_log:             true
+    register:           oasm_disk_status
+
+  - debug:
+      var:              oasm_disk_status.stdout_lines
+      verbosity:        0
 
   - name:               "Initialize {{ oasm_disk.dev }}1 as {{ oasm_disk.disk }}"
     command:            "{{ oracleasm_cmd }} createdisk {{ oasm_disk.disk }} {{ oasm_disk.dev }}1"

@@ -18,9 +18,14 @@
   command:              "{{ oracleasm_cmd }} configure -u oracle"
   when:                 oasm_config.stdout_lines[1] != "ORACLEASM_UID=oracle"
 
+- name:                 "Set test for ASMLib correct group"
+  set_fact:
+    asmlib_correct_group:
+                        "ORACLEASM_GID={{ oracle_user.asm_groups.OSASM.name }}"
+
 - name:                 "Set Group for Oracle ASMLib Driver"
-  command:              "{{ oracleasm_cmd }} configure -g {{ oracle_user.asm_groups.OASM.name }}"
-  when:                 oasm_config.stdout_lines[2] != "ORACLEASM_GID={{ oracle_user.asm_groups.OASM.name }}"
+  command:              "{{ oracleasm_cmd }} configure -g {{ oracle_user.asm_groups.OSASM.name }}"
+  when:                 oasm_config.stdout_lines[2] != asmlib_correct_group
 
 - name:                 "Enable Oracle ASMLib Driver"
   command:              "{{ oracleasm_cmd }} configure -e"
