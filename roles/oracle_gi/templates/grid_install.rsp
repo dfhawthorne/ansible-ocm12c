@@ -154,13 +154,13 @@ oracle.install.asm.OSASM={{ oracle_user.asm_groups.OSASM.name }}
 #-------------------------------------------------------------------------------
 # Specify a name for SCAN
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.gpnp.scanName=
+oracle.install.crs.config.gpnp.scanName={{ oracle.install.crs.config.gpnp.scanName }}
 
 #-------------------------------------------------------------------------------
 # Specify a unused port number for SCAN service
 #-------------------------------------------------------------------------------
 
-oracle.install.crs.config.gpnp.scanPort=
+oracle.install.crs.config.gpnp.scanPort={{ oracle.install.crs.config.gpnp.scanPort }}
 
 ################################################################################
 #                                                                              #
@@ -171,7 +171,7 @@ oracle.install.crs.config.gpnp.scanPort=
 # Specify the type of cluster you would like to configure
 # Allowed values: FLEX and STANDARD
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.ClusterType=
+oracle.install.crs.config.ClusterType={{ oracle.install.crs.config.ClusterType }}
 
 
 #-------------------------------------------------------------------------------
@@ -181,13 +181,13 @@ oracle.install.crs.config.ClusterType=
 # any combination of lower and uppercase alphabets (A - Z), (0 - 9), hyphen(-)
 # and underscore(_).
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.clusterName=
+oracle.install.crs.config.clusterName={{ oracle.install.crs.config.clusterName }}
 
 #-------------------------------------------------------------------------------
 # Specify 'true' if you would like to configure Grid Naming Service(GNS), else
 # specify 'false'
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.gpnp.configureGNS=
+oracle.install.crs.config.gpnp.configureGNS={{ oracle.install.crs.config.gpnp.configureGNS }}
 
 #-------------------------------------------------------------------------------
 # Applicable only if you choose to configure GNS
@@ -241,7 +241,7 @@ oracle.install.crs.config.gpnp.gnsVIPAddress=
 #
 #
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.clusterNodes=
+oracle.install.crs.config.clusterNodes={{ oracle.install.crs.config.clusterNodes }}
 
 #-------------------------------------------------------------------------------
 # The value should be a comma separated strings where each string is as shown below
@@ -257,7 +257,7 @@ oracle.install.crs.config.clusterNodes=
 # For example: eth0:140.87.24.0:1,eth1:10.2.1.0:2,eth2:140.87.52.0:3
 #
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.networkInterfaceList=
+oracle.install.crs.config.networkInterfaceList={{ oracle.install.crs.config.networkInterfaceList }}
 
 
 ################################################################################
@@ -275,7 +275,7 @@ oracle.install.crs.config.networkInterfaceList=
 #   - FILE_SYSTEM_STORAGE
 # If configuring a Flex Cluster, FLEX_ASM_STORAGE is the only allowed value 
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.storageOption=
+oracle.install.crs.config.storageOption={{ oracle.install.crs.config.storageOption }}
 
 #-------------------------------------------------------------------------------
 # These properties are applicable only if FILE_SYSTEM_STORAGE is chosen for 
@@ -307,7 +307,7 @@ oracle.install.crs.config.sharedFileSystemStorage.ocrRedundancy=
 # Specify 'true' if you would like to configure Intelligent Power Management interface
 # (IPMI), else specify 'false'
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.useIPMI=
+oracle.install.crs.config.useIPMI={{ oracle.install.crs.config.useIPMI }}
 
 #-------------------------------------------------------------------------------
 # Applicable only if you choose to configure IPMI
@@ -324,7 +324,7 @@ oracle.install.crs.config.ipmi.bmcPassword=
 #-------------------------------------------------------------------------------
 # Specify a password for SYSASM user of the ASM instance
 #-------------------------------------------------------------------------------
-oracle.install.asm.SYSASMPassword=
+oracle.install.asm.SYSASMPassword={{ oracle_pw.SYSASMPassword | default('very_bad_password') }}
 
 #-------------------------------------------------------------------------------
 # The ASM DiskGroup
@@ -332,7 +332,7 @@ oracle.install.asm.SYSASMPassword=
 # Example: oracle.install.asm.diskGroup.name=data
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.name=
+oracle.install.asm.diskGroup.name={{ oracle.install.asm.diskGroup.name }}
 
 #-------------------------------------------------------------------------------
 # Redundancy level to be used by ASM.
@@ -343,7 +343,7 @@ oracle.install.asm.diskGroup.name=
 # Example: oracle.install.asm.diskGroup.redundancy=NORMAL
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.redundancy=
+oracle.install.asm.diskGroup.redundancy={{ oracle.install.asm.diskGroup.redundancy }}
 
 #-------------------------------------------------------------------------------
 # Allocation unit size to be used by ASM.
@@ -359,7 +359,7 @@ oracle.install.asm.diskGroup.redundancy=
 # size unit is MB
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.AUSize=
+oracle.install.asm.diskGroup.AUSize={{ oracle.install.asm.diskGroup.AUSize }}
 
 #-------------------------------------------------------------------------------
 # List of disks to create a ASM DiskGroup
@@ -371,7 +371,7 @@ oracle.install.asm.diskGroup.AUSize=
 #     oracle.install.asm.diskGroup.disks=\\.\ORCLDISKDATA0,\\.\ORCLDISKDATA1
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.disks=
+oracle.install.asm.diskGroup.disks={{ oracle.install.asm.diskGroup.disks }}
 
 #-------------------------------------------------------------------------------
 # The disk discovery string to be used to discover the disks used create a ASM DiskGroup
@@ -383,12 +383,12 @@ oracle.install.asm.diskGroup.disks=
 #     oracle.install.asm.diskGroup.diskDiscoveryString=\\.\ORCLDISK*
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.diskDiscoveryString=
+oracle.install.asm.diskGroup.diskDiscoveryString={{ oracle.install.asm.diskGroup.diskDiscoveryString }}
 
 #-------------------------------------------------------------------------------
 # oracle.install.asm.monitorPassword=password
 #-------------------------------------------------------------------------------
-oracle.install.asm.monitorPassword=
+oracle.install.asm.monitorPassword={{ oracle_pw.monitorPassword | default('very_bad_password' )}}
 
 #-------------------------------------------------------------------------------
 # Applicable only if configuring CLIENT_ASM_STORAGE for OCR/Voting Disk storage
@@ -418,7 +418,7 @@ oracle.install.crs.config.ignoreDownNodes=
 # 1. CLOUD_CONTROL - If you want to manage your Oracle Grid Infrastructure with Enterprise Manager Cloud Control.
 # 2. NONE   -If you do not want to manage your Oracle Grid Infrastructure with Enterprise Manager Cloud Control.
 #-------------------------------------------------------------------------------
-oracle.install.config.managementOption=
+oracle.install.config.managementOption={{ oracle.install.config.managementOption }}
 
 #-------------------------------------------------------------------------------
 # Specify the OMS host to connect to Cloud Control.

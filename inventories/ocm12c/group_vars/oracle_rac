@@ -1,5 +1,32 @@
+---
 # ------------------------------------------------------------------------------
 # Variables for Oracle RAC
+#
+# ** Do NOT use boolean values **
 # ------------------------------------------------------------------------------
-"oracle_rac":
-  "cluster_name": "redfern-cluster.yaocm.id.au"
+oracle:
+  install:
+    crs:
+      config:
+        gpnp:
+          scanName:     "redfern-crs.yaocm.id.au"
+          scanPort:     1521
+          configureGNS: "false"
+        ClusterType:    "STANDARD"
+        clusterName:    "redfern-cluster"
+        clusterNodes:   "redfern1.yaocm.id.au:redfern1-vip.yaocm.id.au"
+        networkInterfaceList:
+                        "eth0:192.168.1.0:1,eth1:192.168.2.0:2"
+        storageOption:  "LOCAL_ASM_STORAGE"
+        useIPMI:        "false"
+    asm:
+      diskGroup:
+        name:           "VOTE"
+        redundancy:     "EXTERNAL"
+        AUSize:         4
+        disks:          "/dev/oracleasm/disks/VOTE"
+        diskDiscoveryString:
+                        "/dev/oracleasm/disks/*"
+    config:
+      managementOption: "NONE"
+...

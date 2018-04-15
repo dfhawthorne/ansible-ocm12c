@@ -39,23 +39,23 @@
 
 - name:                 "Install latest version of OPatch (P6880880)"
   unarchive:
-    copy:               yes
     dest:               "{{ oracle_gi.oracle_home }}"
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
-    src:                p6880880_122010_Linux-x86-64.zip
+    remote_src:         yes
+    src:                "{{ opatch_nfs_loc }}/p6880880_122010_Linux-x86-64.zip"
   when:                 opatch_version is version(min_opatch_vers, operator='lt', strict=false)
 
 # --------------------- Unpack latest PSU 121020_20180116 (P27010872)
 
 - name:                 "Unpack latest PSU 121020_20180116 (P27010872)"
   unarchive:
-    copy:               yes
     creates:            "{{ patch_loc }}"
     dest:               "{{ patching_dir }}"
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
-    src:                p27010872_121020_Linux-x86-64.zip
+    remote_src:         yes
+    src:                "{{ patches_nfs_loc }}/p{{ patch_num }}_121020_Linux-x86-64.zip"
 
 # --------------------- Validation of Oracle Inventory
 

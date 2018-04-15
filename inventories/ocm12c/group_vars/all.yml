@@ -3,8 +3,15 @@
 # ------------------------------------------------------------------------------
 
 # --------------------- Mount point for shared software location on home network
+#                         and sources for OPatch and other patches
 
 software_nfs_loc:       "/opt/share/Software"
+patches_nfs_loc:        "{{ software_nfs_loc }}/Patches"
+opatch_nfs_loc:         "{{ software_nfs_loc }}/OPatch"
+
+# --------------------- Directory (on NFS) for Grid Infrastructure Installer
+
+grid_installer_loc:     "{{ software_nfs_loc }}/grid/linuxamd64_12102/grid"
 
 # --------------------- Default value for first_node of a cluster
 

@@ -9,7 +9,6 @@
 - name:                 "Set Facts for installation of GI Software"
   set_fact:
     response_file:      "{{ oracle_gi.oracle_base }}/grid_install.rsp"
-    installer_loc:      "{{ software_nfs_loc }}/grid/linuxamd64_12102/grid"
 
 - name:                 "Create response file for silent installation"
   template:
@@ -17,11 +16,14 @@
     dest:               "{{ response_file }}"
   vars:
     install_option:     "CRS_SWONLY"
+    oracle_pw:
+      SYSASMPassword:   "not_the_real_pw"
+      monitorPassword:  "not_the_real_pw"
 
 - name:                 "Install Oracle GI 12.1.0.2 Software Only in Silent Mode"
-  command:              "{{ installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
+  command:              "{{ grid_installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
   args:
-    chdir:              "{{ installer_loc }}"
+    chdir:              "{{ grid_installer_loc }}"
     creates:            "{{ oracle_gi.oracle_home }}/*"
   register:             gi_sw_install_result
   

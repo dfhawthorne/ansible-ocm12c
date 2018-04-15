@@ -40,15 +40,6 @@ Example Playbook
   - oracle_gi
 ```
 
-Incomplete Repository
----------------------
-
-This role is missing two (2) files from the repository:
-1. roles/oracle_gi/files/p27010872_121020_Linux-x86-64.zip
-1. roles/oracle_gi/files/p6880880_122010_Linux-x86-64.zip
-
-These files require a support licence from Oracle.
-
 License
 -------
 
