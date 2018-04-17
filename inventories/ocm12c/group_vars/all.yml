@@ -8,6 +8,7 @@
 software_nfs_loc:       "/opt/share/Software"
 patches_nfs_loc:        "{{ software_nfs_loc }}/Patches"
 opatch_nfs_loc:         "{{ software_nfs_loc }}/OPatch"
+tfa_nfs_loc:            "{{ software_nfs_loc }}/tfa"
 
 # --------------------- Directory (on NFS) for Grid Infrastructure Installer
 

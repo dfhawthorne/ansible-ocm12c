@@ -1,0 +1,65 @@
+---
+# --------------------- Update TFA
+
+- name:                 "Update TFA to lastest version"
+  block:
+  
+  - name:               "Set facts for TFA installation"
+    set_fact:
+      latest_tfa_vers:  "18.1.1"
+      tfa_archive_src:  "{{ tfa_nfs_loc }}/TFA-LINUX_v18.1.1.zip"
+      tfa_cmd_loc:      "{{ oracle_gi.crs_home }}/tfa/bin"
+
+  - name:               "Set more facts for TFA installation"
+    set_fact:
+      tfa_status_cmd:   "{{ tfa_cmd_loc }}/tfactl status | sed -ne \'/{{ ansible_hostname }}/p\'"
+  
+# --------------------- Get Current Version of TFA Tool
+
+  - name:               "Get Current Version of TFA Tool"
+    shell:              "{{ tfa_status_cmd }}"
+    args:
+      chdir:            "{{ tfa_cmd_loc }}"
+      executable:       /bin/sh
+    register:           tfa_vers_data
+    changed_when:       false
+    
+  - debug:
+      var:              tfa_vers_data.stdout_lines
+      verbosity:        1
+
+  - name:               "Extract current TFA version"
+    set_fact:
+      current_tfa_version:
+                        "{{ tfa_vers_data.stdout_lines[0].split('|')[5].strip() }}"
+
+  - debug:
+      var:              current_tfa_version
+      verbosity:        1
+
+# --------------------- Install Latest version of TFA
+
+  - name:               "Extract Installer for Latest version of TFA"
+    unarchive:
+      dest:             /tmp
+      remote_src:       yes
+      src:              "{{ tfa_archive_src }}"
+    when:               current_tfa_version is version(latest_tfa_vers, operator='lt', strict=false)
+    register:           unzip_tfa_installer
+    
+  - name:               "Install latest version of TFA"
+    command:            "/tmp/installTFA-LINUX"
+    when:
+    - unzip_tfa_installer is defined
+    - unzip_tfa_installer is changed
+    register:           install_latest_tfa
+    
+  - debug:
+      var:              install_latest_tfa.stdout_lines
+      verbosity:        0
+    when:               install_latest_tfa is defined
+
+  become:               yes
+  become_user:          root
+  tags:                 install_tfa
+...

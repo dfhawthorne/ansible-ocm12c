@@ -18,6 +18,7 @@
 - name:             Install Oracle GI 12.1.0.2 Software Only
   block:
     - import_tasks: install_gi_sw.yml
+    - import_tasks: install_tfa.yml
     - import_tasks: apply_psu_121020_20180116.yml
       tags:         apply_psu
     - import_tasks: crs_inst.yml
