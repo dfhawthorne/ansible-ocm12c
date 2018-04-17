@@ -9,8 +9,8 @@
   set_fact:
     patch_num:          '27010872'
     patching_dir:       "{{ oracle_gi.oracle_base }}/patching"
-    opatch_cmd:         "{{ oracle_gi.oracle_home }}/OPatch/opatch"
-    opatchauto_cmd:     "{{ oracle_gi.oracle_home }}/OPatch/opatchauto"
+    opatch_cmd:         "{{ oracle_gi.crs_home }}/OPatch/opatch"
+    opatchauto_cmd:     "{{ oracle_gi.crs_home }}/OPatch/opatchauto"
     min_opatch_vers:    '12.1.0.1.7'
 
 - set_fact:
@@ -39,7 +39,7 @@
 
 - name:                 "Install latest version of OPatch (P6880880)"
   unarchive:
-    dest:               "{{ oracle_gi.oracle_home }}"
+    dest:               "{{ oracle_gi.crs_home }}"
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
     remote_src:         yes
@@ -60,13 +60,13 @@
 # --------------------- Validation of Oracle Inventory
 
 - name:                 "Validation of Oracle Inventory"
-  command:              "{{ opatch_cmd }} lsinventory -detail -oh {{ oracle_gi.oracle_home }}"
+  command:              "{{ opatch_cmd }} lsinventory -detail -oh {{ oracle_gi.crs_home }}"
   changed_when:         false
 
 # --------------------- One-off Patch Conflict Detection
 
 - name:                 "One-off Patch Conflict Detection"
-  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.oracle_home }} -analyze"
+  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.crs_home }} -analyze"
   changed_when:         false
   register:             opatch_analyze
   become:               yes
@@ -75,7 +75,7 @@
 # --------------------- Patch Grid Infrastructure (GI) Home
 
 - name:                 "Patch Grid Infrastructure (GI) Home"
-  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.oracle_home }}"
+  command:              "{{ opatchauto_cmd }} apply {{ patch_loc }} -oh {{ oracle_gi.crs_home }}"
   become:               yes
   become_user:          root
   when:

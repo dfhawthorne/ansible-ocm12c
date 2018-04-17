@@ -33,10 +33,10 @@
     set_fact:
       config_response_file:
                         "{{ oracle_gi.oracle_base }}/crs_config.rsp"
-      config_loc:       "{{ oracle_gi.oracle_home }}/crs/config"
+      config_loc:       "{{ oracle_gi.crs_home }}/crs/config"
       tool_response_file:    
                         "{{ oracle_gi.oracle_base }}/cfgrsp.properties"
-      tool_loc:         "{{ oracle_gi.oracle_home }}/cfgtoollogs"
+      tool_loc:         "{{ oracle_gi.crs_home }}/cfgtoollogs"
 
   - name:               "Load Oracle User Password"
     include_vars:
@@ -67,7 +67,7 @@
   - name:               "Run root.sh on first node"
     block:
     - name:             "Run root.sh on first node"
-      command:          "{{ oracle_gi.oracle_home }}/root.sh"
+      command:          "{{ oracle_gi.crs_home }}/root.sh"
       register:         config_root_log
 
     - debug:
