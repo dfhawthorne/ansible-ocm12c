@@ -1,6 +1,7 @@
 ---
 # tasks file for oracle_gi
 # =============================================================================
+# (0) Disable firewall
 # (1) Install Oracle ASMLib Driver
 # (2) Configure Oracle ASMLib Driver
 # (3) Install Oracle GI 12.1.0.2 Software Only
@@ -10,6 +11,7 @@
 
 - name:		    Install and configure Oracle ASMLib driver
   block:
+    - import_tasks: disable_firewall.yml
     - import_tasks: gi_asm.yml
     - import_tasks: oracleasm.yml
   become:           yes

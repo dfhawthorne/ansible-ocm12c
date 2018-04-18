@@ -1,0 +1,28 @@
+---
+# ------------------------------------------------------------------------------
+# Fix for GI configuration problem (issue #16)
+#
+# My Oracle Support says:
+# You need to stop firewall and set SELINUX=permissive. Please refer to 
+# "The root.sh Fails with ORA-29783:GPnP Attribute SET Failed With Error 
+# [CLSGPNP_NOT_FOUND] ( Doc ID 2180883.1 ) " and re-run root.sh 
+# ------------------------------------------------------------------------------
+
+- name:                 "Disable Firewall for GI Installation"
+  block:
+  
+  - name:               "Stop and disable FIREWALLD"
+    service:
+      name:             firewalld
+      enabled:          no
+      state:            stopped
+
+  - name:               "SELINUX has to run in PERMISSIVE mode"
+    selinux:
+      policy:           targeted
+      state:            permissive
+
+  become:               yes
+  become_user:          root
+  tags:                 disable_firewall
+...
