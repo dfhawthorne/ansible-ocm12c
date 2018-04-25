@@ -21,7 +21,13 @@
   block:
     - import_tasks: install_gi_sw.yml
     - import_tasks: install_tfa.yml
-    - import_tasks: apply_psu_121020_20180116.yml
+    - import_tasks: apply_gi_psu.yml
+      vars:
+        patch_num:  '27468957'
+        min_opatch_vers:
+                    '12.1.0.1.7'
+        curr_opatch_vers:
+                    '122010'
       tags:         apply_psu
     - import_tasks: crs_inst.yml
       tags:         crs_inst

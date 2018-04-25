@@ -1,19 +1,24 @@
 ---
 # ------------------------------------------------------------------------------
-# Apply PSU 12.1.0.2.20180116 to the Grid Infrastructure (GI) only
+# Apply Latest PSU to the Grid Infrastructure (GI) only
+# * Need to supply:
+#   * {{ patch_num }}
+#   * {{ min_opatch_vers }}
+#   * {{ curr_opatch_vers }}
 # ------------------------------------------------------------------------------
 
 # --------------------- Set Facts for Patching
 
-- name:                 "Set Facts for Patching"
+- name:                 "Set Simple Facts for Patching"
   set_fact:
-    patch_num:          '27010872'
     patching_dir:       "{{ oracle_gi.oracle_base }}/patching"
     opatch_cmd:         "{{ oracle_gi.crs_home }}/OPatch/opatch"
     opatchauto_cmd:     "{{ oracle_gi.crs_home }}/OPatch/opatchauto"
-    min_opatch_vers:    '12.1.0.1.7'
+    os_patch_family:    "Linux-x86-64"
+    curr_gi_vers:       "121020"
 
-- set_fact:
+- name:                 "Set Complex Facts for Patching"
+  set_fact:
     patch_loc:          "{{ patching_dir }}/{{ patch_num }}"
 
 # --------------------- Creates patching directory
@@ -32,10 +37,11 @@
   register:             opatch_vers_data
   changed_when:         false
 
-- set_fact:
+- name:                 "Extract version of OPatch from command output"
+  set_fact:
     opatch_version:    "{{ opatch_vers_data.stdout_lines[0].split(' ')[2] }}"
 
-# -------------------- Install latest vserion of OPatch, if required
+# --------------------- Install latest vserion of OPatch, if required
 
 - name:                 "Install latest version of OPatch (P6880880)"
   unarchive:
@@ -43,19 +49,19 @@
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
     remote_src:         yes
-    src:                "{{ opatch_nfs_loc }}/p6880880_122010_Linux-x86-64.zip"
+    src:                "{{ opatch_nfs_loc }}/p6880880_{{ curr_opatch_vers }}_{{ os_patch_family }}.zip"
   when:                 opatch_version is version(min_opatch_vers, operator='lt', strict=false)
 
-# --------------------- Unpack latest PSU 121020_20180116 (P27010872)
+# --------------------- Unpack latest PSU 
 
-- name:                 "Unpack latest PSU 121020_20180116 (P27010872)"
+- name:                 "Unpack latest PSU (P{{ patch_num }})"
   unarchive:
     creates:            "{{ patch_loc }}"
     dest:               "{{ patching_dir }}"
     owner:              oracle
     group:              "{{ oracle_user.install_group.name }}"
     remote_src:         yes
-    src:                "{{ patches_nfs_loc }}/p{{ patch_num }}_121020_Linux-x86-64.zip"
+    src:                "{{ patches_nfs_loc }}/p{{ patch_num }}_{{ curr_gi_vers }}_{{ os_patch_family }}.zip"
 
 # --------------------- Validation of Oracle Inventory
 
@@ -81,5 +87,4 @@
   when:
   - opatch_analyze.stdout is search('==Following patches were SUCCESSFULLY analyzed to be applied:')
   - opatch_analyze.stdout is not search('==Following patches were SKIPPED:')
-
 ...
