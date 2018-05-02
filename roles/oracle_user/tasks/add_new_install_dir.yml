@@ -1,0 +1,27 @@
+---
+# ===========================================================================
+# Only set up new directories with:
+# (1) Owner = oracle
+# (2) Group = oinstall (or equivalent)
+# ===========================================================================
+
+- name:                 "Create new directory correct ownership of oracle"
+  block:
+  
+  - name:               "Check if {{ install_dir }} exists"
+    stat:
+      path:             "{{ install_dir }}"
+    register:           oracle_stat
+    
+  - name:               "Creating {{ install_dir }} Directory"
+    file:
+      path:             "{{ install_dir }}"
+      owner:            oracle
+      group:            "{{ oracle_user.install_group.name }}"
+      state:            directory
+    when:               oracle_stat.stat.exists == false
+    
+  become:               yes
+  become_user:          root
+  tags:                 add_new_install_dir
+...
