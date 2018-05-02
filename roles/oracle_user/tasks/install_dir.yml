@@ -5,13 +5,13 @@
 
 
 - name:                 "Creating the Oracle Home and Oracle Base Directory"
-  file:
-    path:               "/opt/{{ item }}"
-    owner:              oracle
-    group:              "{{ oracle_user.install_group.name }}"
-    state:              directory
+  include_tasks:        add_new_install_dir.yml
   with_items:
-    - app/12.1.0/grid
-    - app/grid
-    - app/oracle
+    - /opt/app
+    - /opt/app/12.1.0/grid
+    - /opt/app/grid
+    - /opt/app/oracle
+  loop_control:
+    loop_var:           install_dir
+  tags:                 add_new_install_dir
 ...
