@@ -5,7 +5,7 @@
 # (2) Group = oinstall (or equivalent)
 # ===========================================================================
 
-- name:                 "Create new directory correct ownership of oracle"
+- name:                 "Create new directory with correct ownership of oracle"
   block:
   
   - name:               "Check if {{ install_dir }} exists"
