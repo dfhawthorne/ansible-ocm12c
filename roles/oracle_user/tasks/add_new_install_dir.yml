@@ -19,7 +19,7 @@
       owner:            oracle
       group:            "{{ oracle_user.install_group.name }}"
       state:            directory
-    when:               oracle_stat.stat.exists == false
+    when:               not oracle_stat.stat.exists
     
   become:               yes
   become_user:          root
