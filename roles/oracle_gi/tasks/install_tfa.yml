@@ -8,6 +8,7 @@
     set_fact:
       latest_tfa_vers:  "18.1.1"
       tfa_cmd_loc:      "{{ oracle_gi.crs_home }}/tfa/bin"
+      do_install_tfa:   false
 
   - name:               "Set more facts for TFA installation"
     set_fact:
@@ -79,7 +80,7 @@
   - debug:
       var:              install_latest_tfa.stdout_lines
       verbosity:        0
-    when:               install_latest_tfa is defined
+    when:               install_latest_tfa.stdout_lines is defined
 
   become:               yes
   become_user:          root
