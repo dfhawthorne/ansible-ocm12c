@@ -1,0 +1,27 @@
+---
+# ------------------------------------------------------------------------------
+# Install CLUVFY downloaded from OTN into a directory separate from CRS_HOME
+# ------------------------------------------------------------------------------
+
+- name:                 "Install CLUVFY from OTN"
+  block:
+
+  - name:               "Create CLUVFY Home"
+    file:
+      path:             "{{ oracle_gi.cluvfy_home }}"
+      owner:            oracle
+      group:            "{{ oracle_user.install_group.name }}"
+      state:            directory
+
+  - name:               "Install CLUVFY"
+    unarchive:
+      dest:             "{{ oracle_gi.cluvfy_home }}"
+      remote_src:       yes
+      src:              "{{ cluvfy_nfs_loc }}/cvupack_Linux_x86_64.zip"
+      creates:          "{{ oracle_gi.cluvfy_home }}/bin/cluvfy"
+
+  become:               yes
+  become_user:          oracle
+  tags:                 install_cluvfy
+
+...

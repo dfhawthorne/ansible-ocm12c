@@ -7,7 +7,7 @@
   block:
 
   - name:               "Run Verification Checks for CRS Installation"
-    command:            "{{ oracle_gi.crs_home }}/bin/cluvfy stage -pre crsinst -n {{ ansible_hostname }} -r 12.1"
+    command:            "{{ oracle_gi.cluvfy_home }}/bin/cluvfy stage -pre crsinst -n {{ ansible_hostname }} -r 12.1"
     register:           cluvfy_status
 
   - debug:

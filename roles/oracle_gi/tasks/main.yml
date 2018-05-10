@@ -19,6 +19,8 @@
 
 - name:             Install Oracle GI 12.1.0.2 Software Only
   block:
+    - import_tasks: install_cluvfy.yml
+      tags:         install_cluvfy
     - import_tasks: install_gi_sw.yml
     - import_tasks: install_tfa.yml
     - import_tasks: apply_gi_psu.yml
