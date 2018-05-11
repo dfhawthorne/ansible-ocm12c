@@ -1,7 +1,7 @@
 ---
 # tasks file for oracle_gi
 # ==============================================================================
-# (1) Configure networking -- excluded 
+# (1) Configure networking (Excluded because of issue #31)
 # (2) Disable firewall
 # (3) Install Oracle ASMLib Driver
 # (4) Configure Oracle ASMLib Driver
