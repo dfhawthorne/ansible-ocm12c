@@ -4,7 +4,8 @@
 # (1) Creates the Oracle User through the Oracle pre-installation RPM
 # (2) Creates the installation directories
 # (3) Adds additional groups to the oracle user
-# (4) Mounts software directory on NFS
+# (4) Establishes user equivalency within the cluster
+# (5) Mounts software directory on NFS
 # ==============================================================================
 
 - name:		    Set up ORACLE user
@@ -12,6 +13,7 @@
     - import_tasks: preinstall.yml
     - import_tasks: install_dir.yml
     - import_tasks: user_groups.yml
+    - import_tasks: user_equivalency.yml
     - import_tasks: oracle_software_src.yml
   become:           yes
   become_user:      root
