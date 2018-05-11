@@ -69,32 +69,40 @@
 
     - debug:
         var:            config_root_log.stdout_lines
-        vebosity:       0
+        verbosity:      0
     when:
     - gi_config_result is succeeded
     - gi_config_result.changed
     become:             yes
     become_user:        root
       
-  - name:               "Create response file for silent tools configuration"
-    template:
-      src:              "cfgrsp.properties"
-      dest:             "{{ tool_response_file }}"
-    vars:
-      oracle_pw:
-        SYSASMPassword: "{{ oracle_file_pw.SYSASMPassword }}"
-        monitorPassword:
+  - name:               "Configure CRS Tools Silently"
+    block:
+    - name:             "Create response file for silent tools configuration"
+      template:
+        src:            "cfgrsp.properties"
+        dest:           "{{ tool_response_file }}"
+      vars:
+        oracle_pw:
+          SYSASMPassword:
+                        "{{ oracle_file_pw.SYSASMPassword }}"
+          monitorPassword:
                         "{{ oracle_file_pw.monitorPassword }}"
 
-  - name:               "Silently configure tools on first node only"
-    command:            "{{ tool_loc }}/configToolAllCommands RESPONSE_FILE={{ tool_response_file }}"
-    args:
-      chdir:            "{{ tool_loc }}"
-    register:           tool_config_result
+    - name:             "Silently configure tools on first node only"
+      command:          "{{ tool_loc }}/configToolAllCommands RESPONSE_FILE={{ tool_response_file }}"
+      args:
+        chdir:          "{{ tool_loc }}"
+      register:         tool_config_result
   
-  - debug:
-      var:              tool_config_result.stdout_lines
-      verbosity:        0
+    - debug:
+        var:            tool_config_result.stdout_lines
+        verbosity:      0
+    when:
+    - gi_config_result is succeeded
+    - gi_config_result.changed
+    - config_root_log is succeeded
+    - config_root_log.changed
   when:                 first_node
   become:               yes
   become_user:          oracle
