@@ -1,39 +1,43 @@
 ---
 # tasks file for oracle_gi
-# =============================================================================
-# (0) Disable firewall
-# (1) Install Oracle ASMLib Driver
-# (2) Configure Oracle ASMLib Driver
-# (3) Install Oracle GI 12.1.0.2 Software Only
-# (4) Patch GI Home to PSU 20180116
-# (5) Install CRS
+# ==============================================================================
+# (1) Configure networking -- excluded 
+# (2) Disable firewall
+# (3) Install Oracle ASMLib Driver
+# (4) Configure Oracle ASMLib Driver
+# (5) Install OTN version of CLUVFY
+# (6) Install Oracle GI 12.1.0.2 Software Only
+# (7) Install latest version of TFA
+# (8) Patch GI Home to latest PSU
+# (9) Install CRS
 # ==============================================================================
 
-- name:		    Install and configure Oracle ASMLib driver
+- name:		        "Preparation tasks to be done by root"
   block:
-    - import_tasks: disable_firewall.yml
-    - import_tasks: gi_asm.yml
-    - import_tasks: oracleasm.yml
-  become:           yes
-  become_user:      root
+#   - import_tasks:     networks.yml
+    - import_tasks:     disable_firewall.yml
+    - import_tasks:     gi_asm.yml
+    - import_tasks:     oracleasm.yml
+  become:               yes
+  become_user:          root
 
-- name:             Install Oracle GI 12.1.0.2 Software Only
+- name:                 "Install and Configure Oracle GI 12.1.0.2 Software"
   block:
-    - import_tasks: install_cluvfy.yml
-      tags:         install_cluvfy
-    - import_tasks: install_gi_sw.yml
-    - import_tasks: install_tfa.yml
-    - import_tasks: apply_gi_psu.yml
+    - import_tasks:     install_cluvfy.yml
+      tags:             install_cluvfy
+    - import_tasks:     install_gi_sw.yml
+    - import_tasks:     install_tfa.yml
+    - import_tasks:     apply_gi_psu.yml
       vars:
-        patch_num:  '27468957'
+        patch_num:      '27468957'
         min_opatch_vers:
-                    '12.1.0.1.7'
+                        '12.1.0.1.7'
         curr_opatch_vers:
-                    '122010'
-      tags:         apply_psu
-    - import_tasks: crs_inst.yml
-      tags:         crs_inst
-  become:           yes
-  become_user:      oracle
-  tags:             install_gi_sw
+                        '122010'
+      tags:             apply_psu
+    - import_tasks:     crs_inst.yml
+      tags:             crs_inst
+  become:               yes
+  become_user:          oracle
+  tags:                 install_gi_sw
 ...
