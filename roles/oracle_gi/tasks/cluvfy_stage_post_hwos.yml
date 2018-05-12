@@ -10,7 +10,7 @@
   block:
 
   - name:               "Run Verification Checks for CRS Installation"
-    command:            "{{ cluvfy_cmd }} stage -post hwos -n {{ ansible_hostname }}"
+    command:            "{{ cluvfy_cmd }} stage -post hwos -n {{ ansible_hostname }} -s {{ oracle.install.asm.diskGroup.disks }}"
     register:           cluvfy_stage_post_hwos
     failed_when:        false
     changed_when:       false
