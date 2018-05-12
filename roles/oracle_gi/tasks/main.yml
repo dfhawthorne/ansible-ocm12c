@@ -25,6 +25,7 @@
   block:
     - import_tasks:     install_cluvfy.yml
       tags:             install_cluvfy
+    - import_tasks:     cluvfy_stage_post_hwos.yml
     - import_tasks:     install_gi_sw.yml
     - import_tasks:     install_tfa.yml
     - import_tasks:     apply_gi_psu.yml
@@ -35,8 +36,10 @@
         curr_opatch_vers:
                         '122010'
       tags:             apply_psu
-    - import_tasks:     crs_inst.yml
-      tags:             crs_inst
+    - import_tasks:     cluvfy_stage_pre_crsinst.yml
+    - import_tasks:     configure_crs.yml
+      tags:             configure_crs
+      when:             do_configure_crs
   become:               yes
   become_user:          oracle
   tags:                 install_gi_sw

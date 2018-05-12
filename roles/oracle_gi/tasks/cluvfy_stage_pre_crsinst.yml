@@ -1,0 +1,59 @@
+---
+# ------------------------------------------------------------------------------
+# Checks the cluster is ready for the installation of Grid Infrastructure (GI)
+#
+# Flag, 'do_configure_crs', is set if CRS needs to configured
+# ------------------------------------------------------------------------------
+
+- name:                 "Set flag not to configure CRS"
+  set_fact:
+    do_configure_crs:   false
+  tags:                 cluvfy_stage_pre_crsinst
+
+- name:                 "Checks the cluster is ready for the installation of Grid Infrastructure (GI)"
+  block:
+
+  - name:               "Checks to see if CRS has already been installed and configured"
+    command:            "{{ cluvfy_cmd }} stage -post crsinst -n {{ ansible_hostname }}"
+    register:           cluvfy_stage_post_crsinst
+    failed_when:        false
+    changed_when:       false
+    no_log:             true
+    
+  - debug:
+      var:              cluvfy_crs_comp.stdout_lines
+      verbosity:        0
+
+# --------------------- Run Verification Checks for CRS Installation
+
+  - block:
+    - name:               "Run Verification Checks for CRS Installation"
+      command:            "{{ cluvfy_cmd }} stage -pre crsinst -n {{ ansible_hostname }} -r 12.1"
+      register:           cluvfy_stage_pre_crsinst
+      failed_when:        false
+      no_log:             true
+
+    - debug:
+        var:              cluvfy_stage_pre_crsinst.stdout_lines
+        verbosity:        0
+      when:               cluvfy_stage_pre_crsinst.stdout_lines is defined
+    
+    - fail:
+        msg:              "CLUVFY for installation failed"
+      when:
+      - cluvfy_stage_pre_crsinst is defined
+      - cluvfy_stage_pre_crsinst.rc != 0
+    
+    - name:               "Set flag to configure CRS"
+      set_fact:
+        do_configure_crs: true
+      when:               cluvfy_stage_pre_crsinst is succeeded
+    when:               cluvfy_stage_post_crsinst.rc != 0
+    
+  become:               yes
+  become_user:          oracle
+  when:                 first_node
+  tags:                 cluvfy_stage_pre_crsinst
+  vars:
+    cluvfy_cmd:         "{{ oracle_gi.cluvfy_home }}/bin/cluvfy"
+...

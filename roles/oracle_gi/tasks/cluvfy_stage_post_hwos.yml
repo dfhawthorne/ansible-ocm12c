@@ -1,0 +1,35 @@
+---
+# ------------------------------------------------------------------------------
+# Checks the cluster is ready for the installation of Grid Infrastructure (GI)
+#   software
+#
+# Flag, 'do_configure_crs', is set if CRS needs to configured
+# ------------------------------------------------------------------------------
+
+- name:                 "Checks the cluster is ready for the installation of Grid Infrastructure (GI) Software"
+  block:
+
+  - name:               "Run Verification Checks for CRS Installation"
+    command:            "{{ cluvfy_cmd }} stage -post hwos -n {{ ansible_hostname }}"
+    register:           cluvfy_stage_post_hwos
+    failed_when:        false
+    changed_when:       false
+    no_log:             true
+
+  - debug:
+      var:              cluvfy_stage_post_hwos.stdout_lines
+      verbosity:        0
+    when:               cluvfy_stage_post_hwos.stdout_lines is defined
+    
+  - fail:
+      msg:              "CLUVFY for installation failed"
+    when:               cluvfy_stage_post_hwos.rc != 0
+    
+  become:               yes
+  become_user:          oracle
+  when:                 first_node
+  tags:                 cluvfy_stage_post_hwos
+  vars:
+    cluvfy_cmd:         "{{ oracle_gi.cluvfy_home }}/bin/cluvfy"
+
+...
