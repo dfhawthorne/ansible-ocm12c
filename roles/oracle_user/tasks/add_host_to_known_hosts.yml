@@ -1,0 +1,26 @@
+---
+# ==============================================================================
+# Adds a host name to the known hosts for the oracle user, if not already added.
+# ==============================================================================
+
+- name:                 "Add host {{ new_host_name }} to known hosts"
+  block:
+
+  - name:               "Check known hosts file for entry related to {{ new_host_name }}"
+    command:            "ssh-keygen -f {{ known_hosts_file }} -F {{ new_host_name }}"
+    register:           known_hosts_cmd
+    failed_when:        known_hosts_cmd.rc > 1
+    changed_when:       false
+
+  - name:               "Add host name ({{ new_host_name }}) to known hosts file for oracle"
+    expect:
+      command:          /bin/ssh-copy-id "{{ new_host_name }}" -f
+      responses:
+        'Are you sure you want to continue connecting \(yes/no\)\? ': 'yes'
+    when:               known_hosts_cmd.rc != 0
+
+  become:               yes
+  become_user:          oracle
+  vars:
+    known_hosts_file:   /home/oracle/.ssh/known_hosts
+...
