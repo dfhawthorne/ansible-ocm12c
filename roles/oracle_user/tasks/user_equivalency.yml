@@ -42,6 +42,12 @@
 
 # --------------------- Add nodes of cluster to known hosts file
 
+- name:                 "Ensure known hosts file exists"
+  file:
+    path:               /home/oracle/.ssh/known_hosts
+    state:              touch
+    owner:              oracle
+
 - include_tasks:        add_host_to_known_hosts.yml
   with_items:
   - redfern1
