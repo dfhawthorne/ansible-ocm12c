@@ -44,8 +44,8 @@
 
 - include_tasks:        add_host_to_known_hosts.yml
   with_items:
-  - redfern1
-  - redfern1.yaocm.id.au
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_hostname }}"
   loop_control:
     loop_var:           new_host_name
   become:               yes
