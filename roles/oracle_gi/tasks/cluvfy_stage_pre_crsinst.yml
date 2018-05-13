@@ -21,7 +21,7 @@
     no_log:             true
     
   - debug:
-      var:              cluvfy_crs_comp.stdout_lines
+      var:              cluvfy_stage_post_crsinst.stdout_lines
       verbosity:        0
 
 # --------------------- Run Verification Checks for CRS Installation

@@ -1,0 +1,30 @@
+---
+# ------------------------------------------------------------------------------
+# Checks the cluster is ready for the installation of Grid Infrastructure (GI)
+#
+# Flag, 'do_configure_crs', is set if CRS needs to configured
+# ------------------------------------------------------------------------------
+
+- block:
+  - name:               "Checks to see if CRS has been installed and configured"
+    command:            "{{ cluvfy_cmd }} stage -post crsinst -n {{ ansible_hostname }}"
+    register:           cluvfy_stage_post_crsinst
+    failed_when:        false
+    changed_when:       false
+    no_log:             true
+    
+  - debug:
+      var:              cluvfy_stage_post_crsinst.stdout_lines
+      verbosity:        0
+
+  - fail:
+      msg:              "CRS is not installed correctly"
+    when:               cluvfy_stage_post_crsinst.rc != 0
+    
+  become:               yes
+  become_user:          oracle
+  when:                 first_node
+  tags:                 cluvfy_stage_post_crsinst
+  vars:
+    cluvfy_cmd:         "{{ oracle_gi.cluvfy_home }}/bin/cluvfy"
+...
