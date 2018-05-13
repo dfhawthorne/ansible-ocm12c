@@ -6,6 +6,10 @@
 - name:                 "Add host {{ new_host_name }} to known hosts"
   block:
 
+  - name:               "Ensure {{ known_hosts_file }} exists"
+    shell:              "[ -f {{ known_hosts_file }} ] || touch {{ known_hosts_file }}" 
+    changed_when:       false
+
   - name:               "Check known hosts file for entry related to {{ new_host_name }}"
     command:            "ssh-keygen -f {{ known_hosts_file }} -F {{ new_host_name }}"
     register:           known_hosts_cmd
