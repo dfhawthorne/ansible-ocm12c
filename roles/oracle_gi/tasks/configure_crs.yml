@@ -70,7 +70,7 @@
                         "{{ oracle_file_pw.monitorPassword }}"
 
     - name:             "Silently configure tools on first node only"
-      command:          "{{ tool_loc }}/configToolAllCommands RESPONSE_FILE={{ tool_response_file }}"
+      command:          "/bin/sh {{ tool_loc }}/configToolAllCommands RESPONSE_FILE={{ tool_response_file }}"
       args:
         chdir:          "{{ tool_loc }}"
       register:         tool_config_result
