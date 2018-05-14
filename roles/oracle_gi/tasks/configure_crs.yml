@@ -20,6 +20,8 @@
       file:             oracle_pw.yml
       name:             oracle_file_pw
 
+# --------------------- Create response file for silent CRS configuration
+
   - name:               "Create response file for silent CRS configuration"
     template:
       src:              "grid_install.rsp"
@@ -31,31 +33,34 @@
         monitorPassword:
                         "{{ oracle_file_pw.monitorPassword }}"
 
+# --------------------- Silently configure CRS on first node only
+
   - name:               "Silently configure CRS on first node only"
     command:            "{{ config_loc }}/config.sh -silent -responseFile {{ config_response_file }} -waitforcompletion -ignorePrereq"
     args:
       chdir:            "{{ config_loc }}"
     register:           gi_config_result
   
-  - debug:
+  - name:               "Output from Silently configure CRS on first node only"
+    debug:
       var:              gi_config_result.stdout_lines
       verbosity:        0
 
   - name:               "Run root.sh on first node"
-    block:
-    - name:             "Run root.sh on first node"
-      command:          "{{ oracle_gi.crs_home }}/root.sh"
-      register:         config_root_log
-
-    - debug:
-        var:            config_root_log.stdout_lines
-        verbosity:      0
-    when:
-    - gi_config_result is succeeded
-    - gi_config_result.changed
+    command:            "{{ oracle_gi.crs_home }}/root.sh"
+    register:           config_root_log
+    when:               gi_config_result.stdout is search('root.sh')
     become:             yes
     become_user:        root
+
+  - name:               "Output from root.sh script"
+    debug:
+      var:              config_root_log.stdout_lines
+      verbosity:        0
+    when:               config_root_log.stdout_lines is defined
       
+# --------------------- Configure CRS Tools Silently
+
   - name:               "Configure CRS Tools Silently"
     block:
     - name:             "Create response file for silent tools configuration"
@@ -75,7 +80,8 @@
         chdir:          "{{ tool_loc }}"
       register:         tool_config_result
   
-    - debug:
+    - name:             "Output from Silently configure tools on first node only"
+      debug:
         var:            tool_config_result.stdout_lines
         verbosity:      0
     when:

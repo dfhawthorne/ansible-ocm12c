@@ -10,6 +10,8 @@
   set_fact:
     response_file:      "{{ oracle_gi.oracle_base }}/grid_install.rsp"
 
+# --------------------- Create response file for silent installation
+
 - name:                 "Create response file for silent installation"
   template:
     src:                "grid_install.rsp"
@@ -20,6 +22,8 @@
       SYSASMPassword:   "not_the_real_pw"
       monitorPassword:  "not_the_real_pw"
 
+# --------------------- Install Oracle GI 12.1.0.2 Software Only in Silent Mode
+
 - name:                 "Install Oracle GI 12.1.0.2 Software Only in Silent Mode"
   command:              "{{ grid_installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
   args:
@@ -27,37 +31,36 @@
     creates:            "{{ oracle_gi.crs_home }}/*"
   register:             gi_sw_install_result
   
-- debug:
+- name:                 "output from Install Oracle GI 12.1.0.2 Software Only in Silent Mode"
+  debug:
     var:                gi_sw_install_result.stdout_lines
     verbosity:          0
 
-- name:                 "Run root scripts after installation of Oracle GI 12.1.0.2 Software"
-  block:
-  - name:               "Verifies orainstRoot.sh exists"
-    stat:
-      path:             "{{ oracle_gi.inventory_location }}/orainstRoot.sh"
-    register:           orainstRoot_stat
+# --------------------- Run root scripts
 
-  - name:               "Run orainstRoot.sh after Oracle GI 12.1.0.2 Software Installation"
-    command:            "{{ oracle_gi.inventory_location }}/orainstRoot.sh"
-    register:           orainstRoot
-    when:               orainstRoot_stat.stat.exists
-  
-  - debug:
-      var:              orainstRoot.stdout_lines
-      verbosity:        0
-    when:               orainstRoot is defined
-
-  - name:               "Run root.sh after Oracle GI 12.1.0.2 Software Installation"
-    command:            "{{ oracle_gi.crs_home }}/root.sh"
-    register:           root_sh
-
-  - debug:
-      var:              root_sh.stdout_lines
-    when:               root_sh is defined
+- name:                 "Run orainstRoot.sh after Oracle GI 12.1.0.2 Software Installation"
+  command:              "{{ oracle_gi.inventory_location }}/orainstRoot.sh"
+  register:             orainstRoot
+  when:                 gi_sw_install_result.stdout is search('/orainstRoot.sh')
   become:               yes
   become_user:          root
-  when:
-  - gi_sw_install_result.changed
-  - gi_sw_install_result is succeeded
+  
+- name:                 "Output from orainstRoot.sh script"
+  debug:  
+    var:                orainstRoot.stdout_lines
+    verbosity:          0
+  when:                 orainstRoot.stdout_lines is defined
+
+- name:                 "Run root.sh after Oracle GI 12.1.0.2 Software Installation"
+  command:              "{{ oracle_gi.crs_home }}/root.sh"
+  register:             root_sh
+  when:                 gi_sw_install_result.stdout is search('/root.sh')
+  become:               yes
+  become_user:          root
+
+- name:                 "Output from root.sh script"
+  debug:
+    var:                root_sh.stdout_lines
+    verbosity:          0
+  when:                 root_sh.stdout_lines is defined
 ...
