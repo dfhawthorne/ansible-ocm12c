@@ -1,0 +1,23 @@
+---
+# ------------------------------------------------------------------------------
+# Install NTP for cluster
+# ------------------------------------------------------------------------------
+
+- name:                 "Install NTP for cluster"
+  yum:
+    name:               ntp
+    state:              installed
+  tags:                 ntp
+  become:               yes
+  become_user:          root
+
+- name:                 "Ensure NTPD is running and enabled"
+  service:
+    name:               ntpd
+    state:              started
+    enabled:            yes
+  tags:                 ntp
+  become:               yes
+  become_user:          root
+
+...
