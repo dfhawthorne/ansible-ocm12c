@@ -34,7 +34,8 @@
 - set_fact:
     oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('*.*.name')) }}"
 
-- debug:
+- name:                 "List of groups to be assigned to oralce user"
+  debug:
     var:                oracle_groups
     verbosity:          1
 

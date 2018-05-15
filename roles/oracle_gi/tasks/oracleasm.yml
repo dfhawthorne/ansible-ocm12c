@@ -10,7 +10,8 @@
   register:             oasm_config
   changed_when:         false
 
-- debug:
+- name:                 "OracleASM configuration"
+  debug:
     var:                oasm_config.stdout_lines
     verbosity:          1
 
@@ -42,7 +43,8 @@
   failed_when:          false
   no_log:               true
 
-- debug:
+- name:                 "Status of Oracle ASMLib Driver"
+  debug:
     var:                oasm_status.stdout_lines
     verbosity:          1
 

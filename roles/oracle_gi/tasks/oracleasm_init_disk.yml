@@ -24,7 +24,8 @@
     no_log:             true
     register:           oasm_disk_status
 
-  - debug:
+  - name:               "Status of disk {{ oasm_disk.dev }}1"
+    debug:
       var:              oasm_disk_status.stdout_lines
       verbosity:        0
 

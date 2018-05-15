@@ -16,7 +16,8 @@
     changed_when:       false
     no_log:             true
 
-  - debug:
+  - name:               "Output of CLUVFY Post HWOS Stage Check"
+    debug:
       var:              cluvfy_stage_post_hwos.stdout_lines
       verbosity:        0
     when:               cluvfy_stage_post_hwos.stdout_lines is defined

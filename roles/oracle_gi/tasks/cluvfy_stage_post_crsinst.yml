@@ -13,7 +13,8 @@
     changed_when:       false
     no_log:             true
     
-  - debug:
+  - name:               "Output of CLUVFY Post CRS Installation Check"
+    debug:
       var:              cluvfy_stage_post_crsinst.stdout_lines
       verbosity:        0
 

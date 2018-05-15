@@ -20,7 +20,8 @@
     changed_when:       false
     no_log:             true
     
-  - debug:
+  - name:               "Output from CLUVFY Post CRS Installation Check"
+    debug:
       var:              cluvfy_stage_post_crsinst.stdout_lines
       verbosity:        0
 
@@ -33,7 +34,8 @@
       failed_when:        false
       no_log:             true
 
-    - debug:
+    - name:               "Output from CLUVFY Pre CRS Installation Check"
+      debug:
         var:              cluvfy_stage_pre_crsinst.stdout_lines
         verbosity:        0
       when:               cluvfy_stage_pre_crsinst.stdout_lines is defined

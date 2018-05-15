@@ -36,7 +36,8 @@
       register:         tfa_vers_data
       changed_when:     false
     
-    - debug:
+    - name:             "Current verion of TFA"
+      debug:
         var:            tfa_vers_data.stdout_lines
         verbosity:      1
       when:             tfa_vers_data is succeeded
@@ -46,7 +47,8 @@
         current_tfa_version:
                         "{{ tfa_vers_data.stdout_lines[0].split('|')[5].strip() }}"
 
-    - debug:
+    - name:             "Display current TFA version"
+      debug:
         var:            current_tfa_version
         verbosity:      1
 
@@ -77,7 +79,8 @@
     when:               do_install_tfa
     register:           install_latest_tfa
     
-  - debug:
+  - name:               "Output from installation of TFA"
+    debug:
       var:              install_latest_tfa.stdout_lines
       verbosity:        0
     when:               install_latest_tfa.stdout_lines is defined
