@@ -4,4 +4,6 @@
   service:
     name:               ntpd
     state:              restarted
+  become:               yes
+  become_user:          root
 ...
