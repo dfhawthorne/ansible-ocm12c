@@ -1,2 +1,7 @@
 ---
 # handlers file for oracle_gi
+- name:                 restart ntpd
+  service:
+    name:               ntpd
+    state:              restarted
+...

@@ -1,0 +1,3 @@
+# Command line options for ntpd
+# See MOS Doc ID 2126223.1 (Only applicable for OEL 7+)
+OPTIONS="-g -p /var/run/ntpd.pid"
