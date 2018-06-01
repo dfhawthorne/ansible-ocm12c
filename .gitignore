@@ -1,0 +1,4 @@
+*.retry
+auburn.yml
+roles/oracle_gi/vars/oracle_pw.yml
+roles/oracle_user/vars/oracle_pw.yml
