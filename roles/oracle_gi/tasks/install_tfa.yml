@@ -6,7 +6,7 @@
   
   - name:               "Set facts for TFA installation"
     set_fact:
-      latest_tfa_vers:  "18.1.1"
+      latest_tfa_vers:  "18.2.1"
       tfa_cmd_loc:      "{{ oracle_gi.crs_home }}/tfa/bin"
       do_install_tfa:   false
 
