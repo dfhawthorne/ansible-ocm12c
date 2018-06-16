@@ -29,4 +29,7 @@ oracle:
                         "/dev/oracleasm/disks/*"
     config:
       managementOption: "NONE"
+iscsi:
+    target_server:      "narrabri.yaocm.id.au"
+    target_group:       "redfern"
 ...

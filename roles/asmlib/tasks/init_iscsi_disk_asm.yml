@@ -1,0 +1,16 @@
+---
+# ============================================================================
+# Initialize all required disk devices with the Oracle ASMLib driver
+# ============================================================================
+
+- include_tasks:        oracleasm_init_lun.yml
+  with_items:
+  - { lun: 4, disk: DATA  }
+  - { lun: 0, disk: FRA   }
+  - { lun: 1, disk: REDO1 }
+  - { lun: 2, disk: REDO2 }
+  - { lun: 3, disk: VOTE  }
+  loop_control:
+    loop_var:           oasm_disk
+  tags:                 oracleasm_init_disk
+...

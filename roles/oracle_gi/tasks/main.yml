@@ -4,13 +4,11 @@
 #  (1) Configure networking (Excluded because of issue #31)
 #  (2) Install NTP for cluster
 #  (3) Disable firewall
-#  (4) Install Oracle ASMLib Driver
-#  (5) Configure Oracle ASMLib Driver
-#  (6) Install OTN version of CLUVFY
-#  (7) Install Oracle GI 12.1.0.2 Software Only
-#  (8) Install latest version of TFA
-#  (9) Patch GI Home to latest PSU
-# (10) Install CRS
+#  (4) Install OTN version of CLUVFY
+#  (5) Install Oracle GI 12.1.0.2 Software Only
+#  (6) Install latest version of TFA
+#  (7) Patch GI Home to latest PSU
+#  (8) Install CRS
 # ==============================================================================
 
 - name:		        "Preparation tasks to be done by root"
@@ -18,8 +16,6 @@
 #   - import_tasks:     networks.yml
     - import_tasks:     install_ntp.yml
     - import_tasks:     disable_firewall.yml
-    - import_tasks:     gi_asm.yml
-    - import_tasks:     oracleasm.yml
   become:               yes
   become_user:          root
 

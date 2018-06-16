@@ -1,0 +1,49 @@
+---
+# ==============================================================================
+# Initialise a disk device only if it is not already an ASM disk
+#   Variable oracleam_cmd is inherited from global variables
+# ==============================================================================
+
+- name:                 "Initialise a disk device only if it is not already an ASM disk"
+  block:
+
+  - name:               "Describe iSCSI LUN {{ oasm_disk.lun }}"
+    shell:              "{{ get_dev_for_lun }}"
+    register:           lun_desc
+    vars:
+      get_dev_for_lun:  "ls -l /dev/disk/by-path/*-lun-{{ oasm_disk.lun }}|sed -ne 's#^.*\\.\\./\\.\\./\\(.*\\)#/dev/\\1#p'"
+
+  - name:               "Find disk name for iSCSI LUN {{ oasm_disk.lun }}"
+    set_fact:
+      dev:              "{{ lun_desc.stdout_lines[0] }}"
+
+  - name:               "Ensure that there is one partition that occupies whole disk {{ dev }}"
+    parted:
+      device:           "{{ dev }}"
+      number:           1
+      state:            present
+      label:            msdos
+      part_type:        primary
+      part_start:       0%
+      part_end:         100%
+
+  - name:               "Query status of disk {{ dev }}1"
+    command:            "{{ oracleasm_cmd }} querydisk {{ dev }}1"
+    changed_when:       false
+    failed_when:        false
+    no_log:             true
+    register:           oasm_disk_status
+
+  - name:               "Status of disk {{ dev }}1"
+    debug:
+      var:              oasm_disk_status.stdout_lines
+      verbosity:        0
+
+  - name:               "Initialize {{ dev }}1 as {{ oasm_disk.disk }}"
+    command:            "{{ oracleasm_cmd }} createdisk {{ oasm_disk.disk }} {{ dev }}1"
+    when:               oasm_disk_status.stdout_lines[0] is match("Device .* is not marked as an ASM disk")
+
+  become:               yes
+  become_user:          root
+  tags:                 oracleasm_init_disk
+...

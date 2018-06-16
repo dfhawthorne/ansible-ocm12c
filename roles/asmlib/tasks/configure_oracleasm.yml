@@ -57,18 +57,4 @@
   register:             oasm_status
   changed_when:         false
 
-# ============================================================================
-# Initialize all required disk devices with the Oracle ASMLib driver
-# ============================================================================
-
-- include_tasks:        oracleasm_init_disk.yml
-  with_items:
-  - { dev: /dev/xvdd, disk: DATA }
-  - { dev: /dev/xvde, disk: FRA  }
-  - { dev: /dev/xvdf, disk: REDO1 }
-  - { dev: /dev/xvdg, disk: REDO2 }
-  - { dev: /dev/xvdh, disk: VOTE }
-  loop_control:
-    loop_var:           oasm_disk
-  tags:                 oracleasm_init_disk
 ...

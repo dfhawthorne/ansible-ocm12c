@@ -4,5 +4,7 @@
     - common
     - oracle_user
     - hugepages
+    - iscsi
+    - asmlib
     - oracle_gi
 ...

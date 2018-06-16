@@ -1,0 +1,54 @@
+---
+# ------------------------------------------------------------------------------
+# Install and configure iSCSI for an initiator (client)
+# ------------------------------------------------------------------------------
+
+- name:                 "Simple Facts about iSCSI"
+  set_fact:
+    iscsiadm_cmd:       "/sbin/iscsiadm"
+
+- name:                 "Install iSCSI Software"
+  yum:
+    name:               iscsi-initiator-utils
+    state:              present
+  become:               yes
+  become_user:          root
+
+- name:                 "Check to see if initiator is already logged in"
+  command:              "{{ iscsiadm_cmd }} -m session"
+  register:             iscsi_initiator_status
+  changed_when:         false
+  failed_when:          false
+
+- name:                 "Configure iSCSI initiator"
+  block:
+  - name:               "Discover Targets on Server {{ iscsi.target_server }}"
+    shell:              "{{ get_target_cmd }}"
+    args:
+      executable:       /bin/sh
+    register:           iscsi_target_info
+    vars:
+      get_target_cmd:   "{{ iscsiadm_cmd }} -m discovery -t sendtargets -p narrabri | sed -ne \'/{{ iscsi.target_group }}/p\'"
+
+  - name:               "Populate local iSCSI Discovery Database"
+    command:            "{{ iscsiadm_cmd }} -m discoverydb -t sendtargets -p {{ target_server }}"
+    register:           iscsi_discovery_db
+    vars:
+      target_server:    "{{ iscsi.target_server.split('.')[0] }}"
+
+  - name:               "Results of iSCSI Discovery DB from {{ iscsi.target_server }}"
+    debug:
+      var:              iscsi_discovery_db.stdout_lines
+      verbosity:        0
+
+  - name:               "Login to iSCSI Target"
+    command:            "{{ iscsiadm_cmd }} -m node -T {{ target_group }} -p {{ target_server }} -l"
+    register:           iscsi_logon
+    vars:
+      target_server:    "{{ iscsi_target_info.stdout_lines[0].split()[0] }}"
+      target_group:     "{{ iscsi_target_info.stdout_lines[0].split()[1] }}"
+  
+  become:               yes
+  become_user:          root
+  when:                 iscsi_initiator_status.stderr is search('No active sessions')
+...
