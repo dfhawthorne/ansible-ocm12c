@@ -1,0 +1,18 @@
+---
+# ------------------------------------------------------------------------------
+# Server specific variables for REDFERN2.YAOCM.ID.AU
+# ------------------------------------------------------------------------------
+
+# --------------------- This is not the first node of the REDFERN cluster
+
+first_node:             false
+
+# --------------------- Set number of required Huge Pages
+
+num_huge_pages:         1536
+
+# --------------------- IP address for interconnect
+
+interconnect_address:   "192.168.2.141"
+
+...

@@ -32,6 +32,22 @@
 
   when:                 first_node
 
+# --------------------- Copy SSH private and public keys from the Ansible server
+#                         to other nodes in the cluster
+
+- block:
+  - name:               "Use SSH Public Key from first node"
+    copy:
+      dest:             /home/oracle/.ssh/
+      src:              /etc/ansible/keys/redfern/id_rsa.pub
+
+  - name:               "Use SSH Private Key from first node"
+    copy:
+      dest:             /home/oracle/.ssh/
+      src:              /etc/ansible/keys/redfern/id_rsa
+
+  when:                 not first_node
+
 # --------------------- Add public key to authorized keys
 
 - name:                 "Add public key to authorized keys"
