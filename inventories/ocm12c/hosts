@@ -52,4 +52,4 @@ auburn.yaocm.id.au
 
 [oracle_rac]
 redfern1.yaocm.id.au
-# redfern2.yaocm.id.au first_node=False
+redfern2.yaocm.id.au first_node=False
