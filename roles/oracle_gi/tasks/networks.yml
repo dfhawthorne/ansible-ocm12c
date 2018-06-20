@@ -8,32 +8,21 @@
 - name:                 "Prepare cluster for Oracle GI 12.1 installation (Networking)"
   block:
   
-  - name:               "install needed network manager libs"
-    yum:
-      name:             '{{ item }}'
-      state:            installed
-    with_items:
-      - NetworkManager-glib
-#     - libnm-qt-devel.x86_64
-      - nm-connection-editor.x86_64
-      - libsemanage-python
-      - policycoreutils-python
+  - name:               "Configure Private LAN Interface Device"
+    command:            "nmcli connection mod eth1 ifname eth1"
+    when:               not ( ansible_eth1.device is defined and ansible_eth1.device == "eth1" )
 
-  - name:               "Configure Public LAN Interface"
-    nmcli:
-      conn_name:        eth0
-      dns4:             "192.168.1.252"
-      gw4:              "192.168.1.1"
-      mtu:              1500
-      state:            present
-      type:             ethernet
-      
-  - name:               "Configure Private LAN Interface"
-    nmcli:
-      conn_name:        eth1
-      mtu:              9000
-      state:            present
-      type:             ethernet
+  - name:               "Configure Private LAN Interface IP Address"
+    command:            "nmcli connection mod eth1 ip4 {{ interconnect_address }}/24"
+    when:               not ( ansible_eth1.ipv4 is defined and ansible_eth1.ipv4.address == interconnect_address )
+
+  - name:               "Configure Private LAN Interface IP MTU"
+    command:            "nmcli connection mod eth1 mtu 9000"
+    when:               not ( ansible_eth1.mtu is defined and ansible_eth1.mtu == 9000 )
+
+  - name:               "Configure Private LAN Interface IP Autoconnection"
+    command:            "nmcli connection mod eth1 autoconnect yes"
+    when:               not ( ansible_eth1.active is defined and ansible_eth1.active )
       
   become:               yes
   become_user:          root

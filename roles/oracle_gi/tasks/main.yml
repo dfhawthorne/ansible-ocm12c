@@ -1,7 +1,7 @@
 ---
 # tasks file for oracle_gi
 # ==============================================================================
-#  (1) Configure networking (Excluded because of issue #31)
+#  (1) Configure networking
 #  (2) Install NTP for cluster
 #  (3) Disable firewall
 #  (4) Install OTN version of CLUVFY
@@ -13,7 +13,7 @@
 
 - name:		        "Preparation tasks to be done by root"
   block:
-#   - import_tasks:     networks.yml
+    - import_tasks:     networks.yml
     - import_tasks:     install_ntp.yml
     - import_tasks:     disable_firewall.yml
   become:               yes
