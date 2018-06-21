@@ -5,6 +5,7 @@
     - import_tasks:     install_asmlib_sw.yml
     - import_tasks:     configure_oracleasm.yml
     - import_tasks:     init_iscsi_disk_asm.yml
+    - import_tasks:     scan_asm_disks.yml
   become:               yes
   become_user:          root
 ...

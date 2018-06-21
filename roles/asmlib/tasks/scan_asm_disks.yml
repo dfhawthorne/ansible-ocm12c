@@ -1,0 +1,9 @@
+---
+# Scan for ASM disks
+- name:                 "Scan for ASM Disks"
+  command:              "{{ oracleasm_cmd }} scandisks"
+  changed_when:         false
+  become:               yes
+  become_user:          root
+  tags:                 scan_asm_disks
+...
