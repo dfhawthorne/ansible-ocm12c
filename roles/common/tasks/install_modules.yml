@@ -34,30 +34,39 @@
   become_user:     root
   when:            ansible_distribution == "Ubuntu"
 
-- name:            "Install Python module PEXPECT on OEL systems"
+- name:            "Install Python module PEXPECT on OEL 7+ systems"
   block:
 
-  - name:          "Ensure old version of PEXPECT is not installed on OEL systems"
+  - name:          "Ensure old version of PEXPECT is not installed on OEL 7+ systems"
     yum:
       name:        pexpect
       state:       absent
 
-  - name:          "Install SETUP_TOOLS for EASY_INSTALL on OEL systems"
+  - name:          "Install SETUP_TOOLS for EASY_INSTALL on OEL 7+ systems"
     yum:
       name:        python-setuptools
       state:       latest
-  - name:          "Install PIP on OEL systems"
+
+  - name:          "Install PIP on OEL 7+ systems"
     easy_install:
       name:        pip
       state:       latest
 
-  - name:          "Use PIP to install PEXPECT on OEL systems"
+  - name:          "Use PIP to install PEXPECT on OEL 7+ systems"
     pip:
       name:        pexpect
       state:       latest
   become:          yes
   become_user:     root
-  when:            ansible_distribution == "OracleLinux"
+  when:            ansible_distribution == "OracleLinux" and ansible_distribution_major_version > '6'
+
+- name:            "Ensure old version of PEXPECT is installed on OEL 6 systems"
+  yum:
+    name:          pexpect
+    state:         latest
+  become:          yes
+  become_user:     root
+  when:            ansible_distribution == "OracleLinux" and ansible_distribution_major_version == '6'
 
 # --------------------- Install Perl
 
