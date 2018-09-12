@@ -1,0 +1,18 @@
+# ------------------------------------------------------------------------------
+# Server specific variables for PADSTOW.YAOCM.ID.AU
+# ------------------------------------------------------------------------------
+
+# --------------------- Database configuration parameters
+
+oracle_dbca:
+  OPERATION_TYPE:       "createDatabase"
+  GDBNAME:              "ocm12pri.yaocm.id.au"
+  DATABASECONFTYPE:     "SI"
+  SID:                  "ocm12pri"
+  CREATEASCONTAINERDATABASE:
+                        True
+  NUMBEROFPDBS:         1
+  PDBNAME:              "EXAMPLE"
+  EMCONFIGURATION:      "NONE"
+
+...

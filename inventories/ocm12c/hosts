@@ -53,3 +53,9 @@ auburn.yaocm.id.au
 [oracle_rac]
 redfern1.yaocm.id.au
 redfern2.yaocm.id.au first_node=False
+
+# Oracle data guard nodes
+
+[oracle_dg]
+padstow.yaocm.id.au
+botany.yaocm.id.au
