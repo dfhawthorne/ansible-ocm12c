@@ -12,7 +12,7 @@
   block:
     - import_tasks: preinstall.yml
     - import_tasks: install_dir.yml
-    - import_tasks: user_groups.yml
+    - import_tasks: create_oracle_software_owner.yml
     - import_tasks: user_equivalency.yml
     - import_tasks: oracle_software_src.yml
   become:           yes

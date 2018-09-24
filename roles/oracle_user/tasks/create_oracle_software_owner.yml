@@ -15,6 +15,7 @@
     state:              present
     system:             no
   with_dict:            "{{ oracle_user.asm_groups }}"
+  when:                 is_oracle_asm_installed
 
 - name:                 "Create Database Linux Groups"
   group: 
@@ -33,8 +34,13 @@
 
 - set_fact:
     oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('*.*.name')) }}"
+  when:                 is_oracle_asm_installed
 
-- name:                 "List of groups to be assigned to oralce user"
+- set_fact:
+    oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('db_groups.*.name')) }}"
+  when:                 not is_oracle_asm_installed
+
+- name:                 "List of groups to be assigned to oracle user"
   debug:
     var:                oracle_groups
     verbosity:          1
