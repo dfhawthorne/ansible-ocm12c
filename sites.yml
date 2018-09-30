@@ -1,10 +1,5 @@
 ---
 - hosts:	oracle_rac
   roles:
-    - common
-    - oracle_user
-    - hugepages
-    - iscsi
-    - asmlib
-    - oracle_gi
+    - oracle_clustered_server
 ...

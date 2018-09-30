@@ -1,5 +1,5 @@
 ---
-# handlers file for oracle_gi
+# handlers file for oracle_clustered_server
 - name:                 restart ntpd
   service:
     name:               ntpd

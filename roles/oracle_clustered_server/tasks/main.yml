@@ -1,5 +1,5 @@
 ---
-# tasks file for oracle_gi
+# tasks file for oracle_clustered_server
 # ==============================================================================
 #  (1) Configure networking
 #  (2) Install NTP for cluster

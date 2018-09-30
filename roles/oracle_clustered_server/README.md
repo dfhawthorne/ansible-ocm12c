@@ -1,18 +1,12 @@
-ORACLE_GI
-=========
+ORACLE_CLUSTERED_SERVER
+=======================
 
 This role creates and configures the Oracle Grid Infrastructure (GI) for a Linux cluster.
 
 Requirements
 ------------
 
-The following non-standard packages are required:
-* PEXPECT
-  * This is installed by the COMMON role
-
-The following roles are required:
-* COMMON
-* ORACLE_USER
+See meta/main.yml
 
 Role Variables
 --------------
@@ -26,8 +20,7 @@ The following variables need to be provided for this role:
 Dependencies
 ------------
 
-* COMMON
-* ORACLE_USER
+See meta/main.yml
 
 Example Playbook
 ----------------
@@ -35,13 +28,11 @@ Example Playbook
 ```yml
 - hosts: servers
   roles:
-  - common
-  - oracle_user
-  - oracle_gi
+  - oracle_clustered_server
 ```
 
 License
 -------
 
-BSD
+MIT
 
