@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - oracle_single_server
+    - oracle_standalone_server

@@ -1,4 +1,4 @@
 ---
-# vars file for oracle_single_server
+# vars file for oracle_standalone_server
 is_oracle_asm_installed:
                         False
