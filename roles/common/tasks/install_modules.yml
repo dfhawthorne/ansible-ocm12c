@@ -4,6 +4,7 @@
 # (1) nscd for DNS caching
 # (2) pexpect for the Ansible pexpect module
 # (3) perl for TFA on Oracle systems
+# (4) libselinux-python for OEL6 systems
 # ------------------------------------------------------------------------------
 
 # ---------------- Install NSCD
@@ -79,4 +80,13 @@
   when:                 ansible_distribution == "OracleLinux"
   tags:                 install_perl
 
+# --------------------- Install libselinux-python for OEL6 systems
+
+- name:                 "Install libselinux-python for OEL6 systems"
+  yum:
+    name:               libselinux-python
+    state:              latest
+  become:               yes
+  become_user:          root
+  when:                 ansible_distribution == "OracleLinux" and ansible_distribution_major_version == '6'
 ...
