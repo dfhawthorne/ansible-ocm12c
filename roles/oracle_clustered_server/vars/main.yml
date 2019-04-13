@@ -6,7 +6,4 @@
   "oracle_base":        "/opt/app/grid"
   "crs_home":           "/opt/app/12.1.0/grid"
   "cluvfy_home":        "/opt/app/12.1.0/cluvfy"
-# Oracle ASM is always installed for an Oracle cluster
-"is_oracle_asm_installed":
-                        True
 ...

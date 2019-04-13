@@ -11,7 +11,7 @@ None.
 Role Variables
 --------------
 
-* `is_oracle_asm_installed` - this flag indicates whether support for Oracle ASM is to be installed. This defaults to False for stand-alone servers.
+None
 
 Dependencies
 ------------

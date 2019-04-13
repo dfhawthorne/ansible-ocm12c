@@ -9,11 +9,10 @@
 # (2) ASM groups (also used for GI) - optional
 # (3) Database groups (always created and used)
 #
+# The last two (2) groups are created and added when required.
+#
 # The password for the software owner is loaded from an external file:
 #   roles/oracle_user/files/oracle_pw.yml
-#
-# A flag, is_oracle_asm_installed, is used to include the ASM Linux groups for
-#   the software owner.
 #
 # A dictionary, called 'oracle_user', required. The default value is in:
 #   roles/oracle_user/vars/main.yml
@@ -28,23 +27,6 @@
     state:              present
     system:             no
 
-- name:                 "Create ASM Linux Groups"
-  group: 
-    name:               "{{ item.value.name }}"
-    gid:                "{{ item.value.gid }}"
-    state:              present
-    system:             no
-  with_dict:            "{{ oracle_user.asm_groups }}"
-  when:                 is_oracle_asm_installed
-
-- name:                 "Create Database Linux Groups"
-  group: 
-    name:               "{{ item.value.name }}"
-    gid:                "{{ item.value.gid }}"
-    state:              present
-    system:             no
-  with_dict:            "{{ oracle_user.db_groups }}"
-
 # --------------------- Create Oracle User
 
 - name:                 "Load Oracle User Password"
@@ -52,25 +34,11 @@
     file:               oracle_pw.yml
     name:               oracle_user_pw
 
-- set_fact:
-    oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('*.*.name')) }}"
-  when:                 is_oracle_asm_installed
-
-- set_fact:
-    oracle_groups:      "{{ lookup('flattened', oracle_user | json_query('db_groups.*.name')) }}"
-  when:                 not is_oracle_asm_installed
-
-- name:                 "List of groups to be assigned to Oracle user"
-  debug:
-    var:                oracle_groups
-    verbosity:          1
-
 - name:                 "Set default group and password for Oracle user"
   user:
     name:               oracle
     comment:            "Oracle software owner"
     password:           "{{ oracle_user_pw.password }}"
     group:              "{{ oracle_user.install_group.name }}"
-    groups:             "{{ oracle_user.install_group.name }},{{ oracle_groups }}"
 
 ...

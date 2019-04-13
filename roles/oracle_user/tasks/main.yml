@@ -2,18 +2,14 @@
 # tasks file for oracle_user
 # =============================================================================
 # (1) Creates the Oracle User through the Oracle pre-installation RPM
-# (2) Creates the installation directories
-# (3) Adds additional groups to the oracle user
-# (4) Establishes user equivalency within the cluster
-# (5) Mounts software directory on NFS
+# (2) Set primary group and password for oracle user
+# (3) Mounts software directory on NFS
 # ==============================================================================
 
 - name:		    Set up ORACLE user
   block:
     - import_tasks: preinstall.yml
-    - import_tasks: install_dir.yml
     - import_tasks: create_oracle_software_owner.yml
-    - import_tasks: user_equivalency.yml
     - import_tasks: oracle_software_src.yml
   become:           yes
   become_user:      root
