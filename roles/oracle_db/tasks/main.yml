@@ -1,0 +1,42 @@
+---
+# ------------------------------------------------------------------------------
+# Create database using dbca in silent mode using a response file
+# ------------------------------------------------------------------------------
+
+- name:                 "Create database"
+  block:
+
+  - name:               "Set facts for dbca"
+    set_fact:
+      dbca_loc:         "/opt/app/oracle/product/12.1.0/dbhome_1/bin/dbca"
+      dbca_response_file:
+                        "/tmp/dbca.rsp"
+
+  - name:               "Load Oracle User Password"
+    include_vars:
+      file:             oracle_pw.yml
+      name:             oracle_pw
+
+# --------------------- Create response file for silent DB creation
+
+  - name:               "Create response file for silent DB creation"
+    template:
+      src:              "grid_install.rsp"
+      dest:             "{{ dbca_response_file }}"
+
+# --------------------- Silently create database
+
+  - name:               "Silently create database"
+    command:            "{{ dbca_loc }} -silent -responseFile {{ dbca_response_file }} -continueOnNonFatalErrors false"
+    register:           dbca_result
+  
+  - name:               "Output from silently create database"
+    debug:
+      var:              dbca_result.stdout_lines
+      verbosity:        0
+
+  become:               yes
+  become_user:          oracle
+  tags:                 create_db
+
+...

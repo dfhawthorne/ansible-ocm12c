@@ -2,27 +2,13 @@
 # =============================================================================
 # Install Oracle GI 12.1.0.2 Software Only:
 # (1) Create response file for silent installation
-# (2) Create the directories that are needed
-# (3) Install Oracle GI 12.1.0.2 Software Only in Silent Mode
-# (4) Run root scripts
+# (2) Install Oracle GI 12.1.0.2 Software Only in Silent Mode
+# (3) Run root scripts
 # =============================================================================
 
 - name:                 "Set Facts for installation of GI Software"
   set_fact:
     response_file:      "{{ oracle_gi.oracle_base }}/grid_install.rsp"
-    top_level:          "{{ oracle_gi.inventory_location | dirname }}"
-
-# --------------------- Created the directories needed for installation
-
-- name:                 "Created the directories needed for installation"
-  include_role:
-    name:               common
-    tasks_from:         add_new_install_dir.yml
-  loop:
-    -                   "{{ top_level }}"
-    -                   "{{ oracle_gi.oracle_base }}"
-  loop_control:
-    loop_var:           install_dir
 
 # --------------------- Create response file for silent installation
 

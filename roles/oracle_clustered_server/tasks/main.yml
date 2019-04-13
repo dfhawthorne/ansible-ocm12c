@@ -1,18 +1,20 @@
 ---
 # tasks file for oracle_clustered_server
 # ==============================================================================
-#  (1) Configure networking
-#  (2) Install NTP for cluster
-#  (3) Disable firewall
-#  (4) Install OTN version of CLUVFY
-#  (5) Install Oracle GI 12.1.0.2 Software Only
-#  (6) Install latest version of TFA
-#  (7) Patch GI Home to latest PSU
-#  (8) Install CRS
+#  (1) Create installation directories
+#  (2) Configure networking
+#  (3) Install NTP for cluster
+#  (4) Disable firewall
+#  (5) Install OTN version of CLUVFY
+#  (6) Install Oracle GI 12.1.0.2 Software Only
+#  (7) Install latest version of TFA
+#  (8) Patch GI Home to latest PSU
+#  (9) Install CRS
 # ==============================================================================
 
 - name:		        "Preparation tasks to be done by root"
   block:
+    - import_tasks:     create_installation_dirs.yml
     - import_tasks:     networks.yml
     - import_tasks:     install_ntp.yml
     - import_tasks:     disable_firewall.yml
