@@ -9,15 +9,22 @@
 - name:                 "Sets up Huge Pages for Oracle Enterprise Linux"
   block:
 
-  - name:               "Get Transparent Huge Pages setting"
-    command:            cat /sys/kernel/mm/transparent_hugepage/enabled
-    register:           transparent_hugepage
-    changed_when:       false
+  - name:               "Determine if Transparent Huge Pages can be enabled"
+    stat:
+      path:             /sys/kernel/mm/transparent_hugepage
+    register:           trans_huge_page
 
-  - name:               "Validate Transparent Huge Pages is disabled"
-    fail:
-      msg:              "Transparent Huge Pages is enabled"
-    when:               transparent_hugepage.stdout_lines[0] != 'always madvise [never]'
+  - block:
+    - name:             "Get Transparent Huge Pages setting"
+      command:          cat /sys/kernel/mm/transparent_hugepage/enabled
+      register:         transparent_hugepage
+      changed_when:     false
+
+    - name:             "Validate Transparent Huge Pages is disabled"
+      fail:
+        msg:            "Transparent Huge Pages is enabled"
+      when:             transparent_hugepage.stdout_lines[0] != 'always madvise [never]'
+    when:               trans_huge_page.stat.exists
 
   - name:               "Set number of Huge Pages"
     sysctl:
