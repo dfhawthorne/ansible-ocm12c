@@ -19,5 +19,3 @@ dependencies:
   - role:               common
   - role:               oracle_user
   - role:               hugepages
-  - role:               iscsi
-  - role:               asmlib
