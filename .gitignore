@@ -1,7 +1,6 @@
 *.retry
 *.log
 auburn.yml
-padstow.yml
 roles/oracle_user/vars/oracle_pw.yml
 roles/oracle_db/vars/oracle_pw.yml
 roles/oracle_clustered_server/vars/oracle_pw.yml

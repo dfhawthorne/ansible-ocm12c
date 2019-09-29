@@ -1,39 +1,43 @@
 ---
 # ------------------------------------------------------------------------------
-# Create database using dbca in silent mode using a response file
+# Create database using SQL*Plus
 # ------------------------------------------------------------------------------
 
 - name:                 "Create database"
   block:
-
-  - name:               "Set facts for dbca"
-    set_fact:
-      dbca_loc:         "/opt/app/oracle/product/12.1.0/dbhome_1/bin/dbca"
-      dbca_response_file:
-                        "/tmp/dbca.rsp"
 
   - name:               "Load Oracle User Password"
     include_vars:
       file:             oracle_pw.yml
       name:             oracle_pw
 
-# --------------------- Create response file for silent DB creation
-
-  - name:               "Create response file for silent DB creation"
-    template:
-      src:              "grid_install.rsp"
-      dest:             "{{ dbca_response_file }}"
+# --------------------- Get latest version of SQL Scripts from repository
+#
+  - name:               "Get latest version of SQL Scripts from repository"
+    git:
+      repo:             git@github.com:dfhawthorne/sql-ocm12c.git
+      dest:             /home/oracle/sql-ocm12c
+      clone:            yes
+      update:           yes
 
 # --------------------- Silently create database
 
-  - name:               "Silently create database"
-    command:            "{{ dbca_loc }} -silent -responseFile {{ dbca_response_file }} -continueOnNonFatalErrors false"
-    register:           dbca_result
-  
-  - name:               "Output from silently create database"
-    debug:
-      var:              dbca_result.stdout_lines
-      verbosity:        0
+  - name:               "Check if database has been created"
+    stat:
+      get_attributes:   no
+      get_checksum:     no
+      path:             /opt/app/oracle/oradata/ocm12c_padstow/control01.ctl
+    register:           db_status
+      
+  - name:               "Create database as required"
+    block:
+    
+    - debug:
+        msg:            "Place holder for creation of database"
+        verbosity:      0
+        
+    when:               not db_status.stat.exists
+
 
   become:               yes
   become_user:          oracle

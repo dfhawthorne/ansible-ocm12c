@@ -5,6 +5,7 @@
 # (2) pexpect for the Ansible pexpect module
 # (3) perl for TFA on Oracle systems
 # (4) libselinux-python for OEL6 systems
+# (5) git
 # ------------------------------------------------------------------------------
 
 # ---------------- Install NSCD
@@ -89,4 +90,14 @@
   become:               yes
   become_user:          root
   when:                 ansible_distribution == "OracleLinux" and ansible_distribution_major_version == '6'
+
+# --------------------- Install GIT
+
+- name:                 "Install GIT"
+  yum:
+    name:               git
+    state:              latest
+  become:               yes
+  become_user:          root
+  tags:                 install_git
 ...
