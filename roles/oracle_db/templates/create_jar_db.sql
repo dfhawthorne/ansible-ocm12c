@@ -7,8 +7,8 @@ REM ============================================================================
 REM Set passwords
 REM ============================================================================
 SET VERIFY OFF
-DEFINE pw_sys {{ SYSPassword }}
-DEFINE ps_system {{ SYSTEMPassword }}
+DEFINE pw_sys {{ oracle_pw.SYSPassword }}
+DEFINE ps_system {{ oracle_pw.SYSTEMPassword }}
 REM ============================================================================
 REM Make directories
 REM ============================================================================
