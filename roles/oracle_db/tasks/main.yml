@@ -3,6 +3,19 @@
 # Create database using SQL*Plus
 # ------------------------------------------------------------------------------
 
+# --------------------- Ensure database entry exists in /etc/oratab
+
+- name:                 "Ensure database entry exists in /etc/oratab"
+  lineinfile:
+    path:               /etc/oratab
+    regexp:             '^jar:'
+    line:               "jar:/opt/app/oracle/product/12.1.0/dbhome_1:N"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          root
+
+# --------------------- Create Database using user, oracle.  
+
 - name:                 "Create database"
   block:
 
@@ -22,30 +35,26 @@
 
 # --------------------- Silently create database
 
-  - name:               "Check if database has been created"
-    stat:
-      get_attributes:   no
-      get_checksum:     no
-      path:             /opt/app/oracle/oradata/jar/control01.ctl
-    register:           db_status
-      
-  - name:               "Create database as required"
-    block:
+# --------------------- Create  master script to create database
 
-# --------------------- Run master script to create database
+  - name:               "Create master script for creating database"
+    template: 
+      src:              create_jar_db.sh
+      dest:             /tmp/create_jar_db.sh
 
-    - name:             "Create master script for creating database"
-      template:
-        src:            create_jar_db.sql
-        dest:           /tmp/create_jar_db.sql
+# --------------------- Run master script
 
+  - name:               "Run database creation script"
+    command:            '/bin/sh /tmp/create_jar_db.sh'
+    args:
+      creates:          '/opt/app/oracle/oradata/JAR/controlfile'
 
-    
-    - debug:
-        msg:            "Place holder for creation of database"
-        verbosity:      0
-        
-    when:               not db_status.stat.exists
+# --------------------- Remove master script
+       
+  - name:               "Remove master creation script"
+    file:
+      path:             '/tmp/create_jar_db.sh'
+      state:            absent
 
 
   become:               yes

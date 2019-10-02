@@ -7,14 +7,8 @@ REM ============================================================================
 REM Set passwords
 REM ============================================================================
 SET VERIFY OFF
-DEFINE pw_sys {{ oracle_pw.SYSPassword }}
-DEFINE ps_system {{ oracle_pw.SYSTEMPassword }}
-REM ============================================================================
-REM Make directories
-REM ============================================================================
-HOST mkdir -p /opt/app/oracle/admin/jar/adump
-HOST mkdir -p /opt/app/oracle/oradata
-HOST mkdir -p /opt/app/oracle/fast_recovery_area
+DEFINE pw_sys="{{ oracle_pw.SYSPassword }}"
+DEFINE pw_system="{{ oracle_pw.SYSTEMPassword }}"
 REM ============================================================================
 REM Create Server Parameter File
 REM ============================================================================
