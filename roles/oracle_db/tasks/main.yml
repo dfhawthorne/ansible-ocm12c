@@ -25,7 +25,7 @@
       name:             oracle_pw
 
 # --------------------- Get latest version of SQL Scripts from repository
-#
+ 
   - name:               "Get latest version of SQL Scripts from repository"
     git:
       repo:             git@github.com:dfhawthorne/sql-ocm12c.git
@@ -35,27 +35,43 @@
 
 # --------------------- Silently create database
 
+  - name:               "Check if control file has already been create"
+    stat:
+      path:             '/opt/app/oracle/oradata/JAR/controlfile'
+    register:           cf_stat
+    
+  - name:               "Silently create database"
+    block:
+
 # --------------------- Create  master script to create database
 
-  - name:               "Create master script for creating database"
-    template: 
-      src:              create_jar_db.sh
-      dest:             /tmp/create_jar_db.sh
+    - name:             "Create master script for creating database"
+      template: 
+        src:            create_jar_db.sh
+        dest:           /tmp/create_jar_db.sh
 
 # --------------------- Run master script
 
-  - name:               "Run database creation script"
-    command:            '/bin/sh /tmp/create_jar_db.sh'
-    args:
-      creates:          '/opt/app/oracle/oradata/JAR/controlfile'
+    - name:             "Run database creation script"
+      command:          '/bin/sh /tmp/create_jar_db.sh'
+      register:         db_creation
+
+    - name:             "Output from database creation script"
+      debug:
+        var:            db_creation.stdout_lines
+
+    - name:             "Errors from database creation script"
+      debug:
+        var:            db_creation.stderr_lines
 
 # --------------------- Remove master script
        
-  - name:               "Remove master creation script"
-    file:
-      path:             '/tmp/create_jar_db.sh'
-      state:            absent
+    - name:             "Remove master creation script"
+      file:
+        path:           '/tmp/create_jar_db.sh'
+        state:          absent
 
+    when:               not cf_stat.stat.exists
 
   become:               yes
   become_user:          oracle
