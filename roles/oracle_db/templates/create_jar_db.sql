@@ -1,8 +1,11 @@
 REM ============================================================================
 REM Error handling
 REM ============================================================================
-WHENEVER OSERROR  EXIT FAILURE
-WHENEVER SQLERROR EXIT FAILURE
+REM Following statement causes "O/S Message: No child processes" (see
+REM https://yaocm.wordpress.com/2019/10/02/technical-note-on-o-s-message-no-child-processes/
+REM for discussion)
+REM WHENEVER OSERROR  EXIT FAILURE
+REM WHENEVER SQLERROR EXIT FAILURE
 REM ============================================================================
 REM Set passwords
 REM ============================================================================

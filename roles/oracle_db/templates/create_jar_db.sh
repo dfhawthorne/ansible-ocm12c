@@ -9,6 +9,7 @@
 
 export ORACLE_SID=jar
 export ORACLE_HOME=/opt/app/oracle/product/12.1.0/dbhome_1
+export PATH=${ORACLE_HOME}/perl/bin:${ORACLE_HOME}/bin:${PATH}
 
 # ------------------------------------------------------------------------------
 # Make directories
