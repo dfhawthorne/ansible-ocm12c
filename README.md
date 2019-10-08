@@ -1,5 +1,5 @@
 # ansible-ocm12c
-Ansible playbooks and associated files for constructing an Oracle 12C RAC environment as well as single instance environments for Oracle 12 Data Gurad.
+Ansible playbooks and associated files for constructing an Oracle 12C RAC environment as well as single instance environments for Oracle 12 Data Guard.
 
 **Incomplete Repository**
 
