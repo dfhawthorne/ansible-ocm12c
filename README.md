@@ -10,3 +10,7 @@ This repository is missing two (2) files:
 These files contains passwords.
 
 Installation files are all stored on a NFS mount point (/opt/share/Software).
+
+## Design Journal
+
+I am maintaining a design journal on my [blog](https://yaocm.wordpress.com). I am also maintaining a catalogue of these entries [here](https://sites.google.com/site/yetanotherocmoriginal/home/12-ocm/design-journal).
