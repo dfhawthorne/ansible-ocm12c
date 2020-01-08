@@ -1,0 +1,65 @@
+---
+# =============================================================================
+# Install Oracle Client 12.1.0.2 Software Only:
+# (1) Create response file for silent installation
+# (2) Install Oracle Client 12.1.0.2 Software Only in Silent Mode
+# (3) Run root scripts
+# =============================================================================
+
+- name:                 "Set Facts for installation of Client Software"
+  set_fact:
+    response_file:      "{{ oracle_client.oracle_base }}/client_install.rsp"
+
+# --------------------- Create response file for silent installation
+
+- name:                 "Create response file for silent installation"
+  template:
+    src:                "client_install.rsp"
+    dest:               "{{ response_file }}"
+  vars:
+    install_option:     "Administrator"
+
+# --------------------- Install Oracle Client 12.1.0.2 Software Only in Silent Mode
+
+- name:                 "Install Oracle Client 12.1.0.2 Software Only in Silent Mode"
+  command:              "{{ client_installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
+  args:
+    chdir:              "{{ client_installer_loc }}"
+    creates:            "{{ oracle_client.oracle_home }}/*"
+  register:             client_sw_install_result
+  become:               yes
+  become_user:          oracle
+  
+- name:                 "output from Install Oracle Client 12.1.0.2 Software Only in Silent Mode"
+  debug:
+    var:                client_sw_install_result.stdout_lines
+    verbosity:          0
+
+# --------------------- Run root scripts
+
+- name:                 "Run orainstRoot.sh after Oracle Client 12.1.0.2 Software Installation"
+  command:              "{{ oracle_client.inventory_location }}/orainstRoot.sh"
+  register:             orainstRoot
+  when:                 client_sw_install_result.stdout is search('/orainstRoot.sh')
+  become:               yes
+  become_user:          root
+  
+- name:                 "Output from orainstRoot.sh script"
+  debug:  
+    var:                orainstRoot.stdout_lines
+    verbosity:          0
+  when:                 orainstRoot.stdout_lines is defined
+
+- name:                 "Run root.sh after Oracle Client 12.1.0.2 Software Installation"
+  command:              "{{ oracle_client.oracle_home }}/root.sh"
+  register:             root_sh
+  when:                 client_sw_install_result.stdout is search('/root.sh')
+  become:               yes
+  become_user:          root
+
+- name:                 "Output from root.sh script"
+  debug:
+    var:                root_sh.stdout_lines
+    verbosity:          0
+  when:                 root_sh.stdout_lines is defined
+...

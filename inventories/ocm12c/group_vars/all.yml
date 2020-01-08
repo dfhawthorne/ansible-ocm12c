@@ -16,6 +16,10 @@ cluvfy_nfs_loc:         "{{ software_nfs_loc }}/grid"
 
 grid_installer_loc:     "{{ software_nfs_loc }}/grid/linuxamd64_12102/grid"
 
+# --------------------- Directory (on NFS) for Oracle Client Installer
+
+client_installer_loc:   "{{ software_nfs_loc }}/database/linuxamd64_12102/client"
+
 # --------------------- Default value for first_node of a cluster
 
 first_node:             false

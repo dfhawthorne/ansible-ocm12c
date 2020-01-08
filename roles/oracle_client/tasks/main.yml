@@ -1,0 +1,5 @@
+---
+# tasks file for oracle_client
+- import_tasks:         create_installation_dirs.yml
+- import_tasks:         install_client_sw.yml
+...
