@@ -1,0 +1,34 @@
+---
+- hosts:                redfern1.yaocm.id.au
+  tasks:
+    - name:             ensure a list of packages installed
+      yum:
+        name:           "{{ packages }}"
+        state:          "present"
+      vars:
+        packages:
+          - dbus
+          - NetworkManager-glib
+      become:           yes
+      become_user:      root
+
+    - name:             Configure primary NIC
+      nmcli:
+        autoconnect:    yes
+        conn_name:      "eth0"
+        dhcp_client_id: "redfern1.yaocm.id.au"
+        dns4:           ["192.168.1.252", "192.168.1.1"]
+        dns4_search:    ["yaocm.id.au"]
+        gw4:            "192.168.1.1"
+        ifname:         "eth0"
+        ip4:            "192.168.1.140"
+        mtu:            9000
+        state:          "present"
+        type:           "ethernet"
+      become:           yes
+      become_user:      root
+      register:         nmcli
+
+    - debug:
+        var:            nmcli
+...
