@@ -1,5 +1,6 @@
 *.retry
 *.log
+*.swp
 auburn.yml
 roles/oracle_user/vars/oracle_pw.yml
 roles/oracle_db/vars/oracle_pw.yml

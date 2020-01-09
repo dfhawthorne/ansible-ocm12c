@@ -18,6 +18,8 @@
     dest:               "{{ response_file }}"
   vars:
     install_option:     "Administrator"
+  become:               yes
+  become_user:          oracle
 
 # --------------------- Install Oracle Client 12.1.0.2 Software Only in Silent Mode
 
@@ -50,16 +52,18 @@
     verbosity:          0
   when:                 orainstRoot.stdout_lines is defined
 
-- name:                 "Run root.sh after Oracle Client 12.1.0.2 Software Installation"
-  command:              "{{ oracle_client.oracle_home }}/root.sh"
-  register:             root_sh
-  when:                 client_sw_install_result.stdout is search('/root.sh')
-  become:               yes
-  become_user:          root
+# --------------------- Configure all tools
 
-- name:                 "Output from root.sh script"
+- name:                 "Run configToolAllCommands after Oracle Client 12.1.0.2 Software Installation"
+  command:              "{{ oracle_client.oracle_home }}/cfgtoollogs/configToolAllCommands"
+  register:             configToolAllCommands
+  when:                 client_sw_install_result.stdout is search('/cfgtoollogs/configToolAllCommands')
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Output from configToolAllCommands script"
   debug:
-    var:                root_sh.stdout_lines
+    var:                configToolAllCommands.stdout_lines
     verbosity:          0
-  when:                 root_sh.stdout_lines is defined
+  when:                 configToolAllCommands.stdout_lines is defined
 ...

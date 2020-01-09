@@ -27,7 +27,7 @@ ORACLE_HOSTNAME={{ inventory_hostname }}
 #-------------------------------------------------------------------------------
 # Unix group to be set for the inventory directory.
 #------------------------------------------------------------------------------- 
-UNIX_GROUP_NAME={{ oracle_user.install_grp.name }}
+UNIX_GROUP_NAME={{ oracle_user.install_group.name }}
 #-------------------------------------------------------------------------------
 # Inventory location.
 #-------------------------------------------------------------------------------
