@@ -1,0 +1,16 @@
+---
+# ---------------------------------------------------------------------------
+# Clone the SQL-OCM12C repository from GitHub
+# ---------------------------------------------------------------------------
+
+# --------------------- Get latest version of SQL Scripts from repository
+ 
+- name:                 "Get latest version of SQL Scripts from repository"
+  git:
+    repo:               git@github.com:dfhawthorne/sql-ocm12c.git
+    dest:               /home/oracle/sql-ocm12c
+    clone:              yes
+    update:             yes
+  become:               yes
+  become_user:          oracle
+...
