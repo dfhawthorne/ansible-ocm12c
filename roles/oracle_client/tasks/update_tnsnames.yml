@@ -41,7 +41,7 @@
   lineinfile:
     path:               "{{ tnsnames }}"
     regexp:             '^PADSTOW_DG\s*=\s*'
-    line:               "PADSTOW_DG=(DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=ocm12_padstow_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED))(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au))(PORT=1521)))"
+    line:               "PADSTOW_DG=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ocm12_padstow_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED)))"
     insertbefore:       EOF
   become:               yes
   become_user:          oracle
@@ -50,7 +50,7 @@
   lineinfile:
     path:               "{{ tnsnames }}"
     regexp:             '^BOTANY_DG\s*=\s*'
-    line:               "BOTANY_DG=(DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=ocm12_botany_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED))(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au))(PORT=1521)))"
+    line:               "BOTANY_DG=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ocm12_botany_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED)))"
     insertbefore:       EOF
   become:               yes
   become_user:          oracle
