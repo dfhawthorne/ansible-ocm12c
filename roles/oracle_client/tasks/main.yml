@@ -2,4 +2,10 @@
 # tasks file for oracle_client
 - import_tasks:         create_installation_dirs.yml
 - import_tasks:         install_client_sw.yml
+- import_tasks:         update_tnsnames.yml
+  vars:
+    tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
+- include_role:
+    name:               common
+    tasks_from:         clone_sql_ocm12c.yml
 ...

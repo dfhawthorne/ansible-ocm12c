@@ -1,0 +1,59 @@
+---
+# ------------------------------------------------------------------------------
+# Creates and maintains the TNSNAMES file for data guard
+#
+# The variable 'tnsnames' must be defined
+# ------------------------------------------------------------------------------
+
+# --------------------- Ensure TNSNAMES file exists
+
+- name:                 "Ensure TNSNAMES file exists"
+  file:
+    group:              "{{ oracle_user.install_group.name }}"
+    mode:               0644
+    owner:              "oracle"
+    path:               "{{ tnsnames }}"
+    state:              "touch"
+  become:               yes
+  become_user:          oracle
+    
+# --------------------- Add aliases for DG databases
+
+- name:                 "Add OCM12C_PADSTOW alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^OCM12C_PADSTOW\s*=\s*'
+    line:               "OCM12C_PADSTOW=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ocm12c_padstow.yaocm.id.au)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add OCM12C_BOTANY alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^OCM12C_BOTANY\s*=\s*'
+    line:               "OCM12C_BOTANY=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ocm12c_botany.yaocm.id.au)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add PADSTOW_DG alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^PADSTOW_DG\s*=\s*'
+    line:               "PADSTOW_DG=(DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=ocm12_padstow_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED))(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au))(PORT=1521)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add BOTANY_DG alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^BOTANY_DG\s*=\s*'
+    line:               "BOTANY_DG=(DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=ocm12_botany_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12)(SERVER=DEDICATED))(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au))(PORT=1521)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+...
+
