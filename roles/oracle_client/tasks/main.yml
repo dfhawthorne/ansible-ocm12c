@@ -8,4 +8,15 @@
 - include_role:
     name:               common
     tasks_from:         clone_sql_ocm12c.yml
+
+- name:                 "Update .bash_profile with Oracle Client info"
+  blockinfile:
+    path:               "/home/oracle/.bash_profile"
+    insertafter:        "EOF"
+    block: |
+      export ORACLE_HOME={{ oracle_client.oracle_home }}
+      export PATH=${ORACLE_HOME}/bin:${PATH}
+  become:               yes
+  become_user:          oracle
+
 ...
