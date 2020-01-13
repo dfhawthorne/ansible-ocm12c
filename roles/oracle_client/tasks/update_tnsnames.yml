@@ -4,23 +4,15 @@
 #
 # The variable 'tnsnames' must be defined
 # ------------------------------------------------------------------------------
-
-# --------------------- Ensure TNSNAMES file exists
-
-- name:                 "Ensure TNSNAMES file exists"
-  file:
-    group:              "{{ oracle_user.install_group.name }}"
-    mode:               0644
-    owner:              "oracle"
-    path:               "{{ tnsnames }}"
-    state:              "touch"
-  become:               yes
-  become_user:          oracle
     
 # --------------------- Add aliases for DG databases
 
 - name:                 "Add OCM12C_PADSTOW alias to TNSNAMES file"
   lineinfile:
+    create:             "yes"
+    group:              "{{ oracle_user.install_group.name }}"
+    mode:               0644
+    owner:              "oracle"
     path:               "{{ tnsnames }}"
     regexp:             '^OCM12C_PADSTOW\s*=\s*'
     line:               "OCM12C_PADSTOW=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ocm12c_padstow.yaocm.id.au)))"
