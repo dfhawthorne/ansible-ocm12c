@@ -5,7 +5,7 @@
 - import_tasks:         update_tnsnames.yml
   vars:
     tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
-#- include_role:
-#    name:               common
-#tasks_from:         clone_sql_ocm12c.yml
+- include_role:
+    name:               common
+    tasks_from:         clone_sql_ocm12c.yml
 ...
