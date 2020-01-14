@@ -89,16 +89,16 @@
     verbosity:          0
   when:                 configToolAllCommands.stdout_lines is defined
 
-- name:                 "Set path of TNSNAMES file"
-  set_fact:
-    tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
-
 # ------------------------------------------------------------------------------
 # Creates and maintains the TNSNAMES file for data guard
 #
 # The variable 'tnsnames' must be defined
 # ------------------------------------------------------------------------------
     
+- name:                 "Set path of TNSNAMES file"
+  set_fact:
+    tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
+
 # --------------------- Add aliases for DG databases
 
 - name:                 "Add OCM12C_PADSTOW alias to TNSNAMES file"
