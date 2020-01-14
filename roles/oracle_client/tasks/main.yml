@@ -1,10 +1,152 @@
 ---
 # tasks file for oracle_client
-- import_tasks:         create_installation_dirs.yml
-- import_tasks:         install_client_sw.yml
-- import_tasks:         update_tnsnames.yml
+
+# ------------------------------------------------------------------------------
+# Create the minimal installation directories needed to install Oracle Client.
+#
+# The ownership of these directories is set to oracle and its installation
+#   group. This is to be done ONLY ONCE as the root scripts change the
+#   persmissions later during software installation.
+# ------------------------------------------------------------------------------
+
+# --------------------- Created the directories needed for installation
+
+- name:                 "Created the directories needed for installation"
+  include_role:
+    name:               common
+    tasks_from:         add_new_install_dir.yml
+  loop:
+    -                   "{{ oracle_client.inventory_location | dirname }}"
+    -                   "{{ oracle_client.oracle_base }}"
+  loop_control:
+    loop_var:           install_dir
+    
+# =============================================================================
+# Install Oracle Client 12.1.0.2 Software Only:
+# (1) Create response file for silent installation
+# (2) Install Oracle Client 12.1.0.2 Software Only in Silent Mode
+# (3) Run root scripts
+# =============================================================================
+
+- name:                 "Set Facts for installation of Client Software"
+  set_fact:
+    response_file:      "{{ oracle_client.oracle_base }}/client_install.rsp"
+
+# --------------------- Create response file for silent installation
+
+- name:                 "Create response file for silent installation"
+  template:
+    src:                "client_install.rsp"
+    dest:               "{{ response_file }}"
   vars:
+    install_option:     "Administrator"
+  become:               yes
+  become_user:          oracle
+
+# --------------------- Install Oracle Client 12.1.0.2 Software Only in Silent Mode
+
+- name:                 "Install Oracle Client 12.1.0.2 Software Only in Silent Mode"
+  command:              "{{ client_installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
+  args:
+    chdir:              "{{ client_installer_loc }}"
+    creates:            "{{ oracle_client.oracle_home }}/*"
+  register:             client_sw_install_result
+  become:               yes
+  become_user:          oracle
+
+- name:                 "output from Install Oracle Client 12.1.0.2 Software Only in Silent Mode"
+  debug:
+    var:                client_sw_install_result.stdout_lines
+    verbosity:          0
+
+# --------------------- Run root scripts
+
+- name:                 "Run orainstRoot.sh after Oracle Client 12.1.0.2 Software Installation"
+  command:              "{{ oracle_client.inventory_location }}/orainstRoot.sh"
+  register:             orainstRoot
+  when:                 client_sw_install_result.stdout is search('/orainstRoot.sh')
+  become:               yes
+  become_user:          root
+
+- name:                 "Output from orainstRoot.sh script"
+  debug:
+    var:                orainstRoot.stdout_lines
+    verbosity:          0
+  when:                 orainstRoot.stdout_lines is defined
+
+# --------------------- Configure all tools
+
+- name:                 "Run configToolAllCommands after Oracle Client 12.1.0.2 Software Installation"
+  command:              "{{ oracle_client.oracle_home }}/cfgtoollogs/configToolAllCommands"
+  register:             configToolAllCommands
+  when:                 client_sw_install_result.stdout is search('/cfgtoollogs/configToolAllCommands')
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Output from configToolAllCommands script"
+  debug:
+    var:                configToolAllCommands.stdout_lines
+    verbosity:          0
+  when:                 configToolAllCommands.stdout_lines is defined
+
+- name:                 "Set path of TNSNAMES file"
+  set_fact:
     tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
+
+# ------------------------------------------------------------------------------
+# Creates and maintains the TNSNAMES file for data guard
+#
+# The variable 'tnsnames' must be defined
+# ------------------------------------------------------------------------------
+    
+# --------------------- Add aliases for DG databases
+
+- name:                 "Add OCM12C_PADSTOW alias to TNSNAMES file"
+  lineinfile:
+    create:             "yes"
+    group:              "{{ oracle_user.install_group.name }}"
+    mode:               0644
+    owner:              "oracle"
+    path:               "{{ tnsnames }}"
+    regexp:             '^OCM12C_PADSTOW\s*=\s*'
+    line:               "OCM12C_PADSTOW=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ocm12c_padstow.yaocm.id.au)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add OCM12C_BOTANY alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^OCM12C_BOTANY\s*=\s*'
+    line:               "OCM12C_BOTANY=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ocm12c_botany.yaocm.id.au)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add PADSTOW_DG alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^PADSTOW_DG\s*=\s*'
+    line:               "PADSTOW_DG=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ocm12_padstow_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12c)(SERVER=DEDICATED)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+- name:                 "Add BOTANY_DG alias to TNSNAMES file"
+  lineinfile:
+    path:               "{{ tnsnames }}"
+    regexp:             '^BOTANY_DG\s*=\s*'
+    line:               "BOTANY_DG=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ocm12_botany_DGMGRL.yaocm.id.au)(INSTANCE_NAME=ocm12c)(SERVER=DEDICATED)))"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
+
+# ------------------------------------------------------------------------------
+# Get latest version of SQL scripts and configure Oracle Client environment
+# ------------------------------------------------------------------------------
+
+# --------------------- Refresh SQL Scripts Library from GitHub
+
 - include_role:
     name:               common
     tasks_from:         clone_sql_ocm12c.yml
