@@ -15,4 +15,8 @@ oracle_dbca:
   PDBNAME:              "EXAMPLE"
   EMCONFIGURATION:      "NONE"
 
+oracle_vars:
+  "inventory_location": "/opt/app/oraInventory"
+  "oracle_base":        "/opt/app/oracle"
+  "oracle_home":        "/opt/app/oracle/product/12.1.0.2/dbhome_1"
 ...

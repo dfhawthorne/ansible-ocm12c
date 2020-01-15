@@ -8,16 +8,16 @@
 # ------------------------------------------------------------------------------
 
 export ORACLE_SID=jar
-export ORACLE_HOME=/opt/app/oracle/product/12.1.0/dbhome_1
+export ORACLE_HOME={{ oracle_vars.oracle_home }}
 export PATH=${ORACLE_HOME}/perl/bin:${ORACLE_HOME}/bin:${PATH}
 
 # ------------------------------------------------------------------------------
 # Make directories
 # ------------------------------------------------------------------------------
 
-mkdir -p /opt/app/oracle/admin/jar/adump
-mkdir -p /opt/app/oracle/oradata
-mkdir -p /opt/app/oracle/fast_recovery_area
+mkdir -p {{ oracle_vars.oracle_base }}/admin/jar/adump
+mkdir -p {{ oracle_vars.oracle_base }}/oradata
+mkdir -p {{ oracle_vars.oracle_base }}/fast_recovery_area
 
 # ------------------------------------------------------------------------------
 # Create database using SQL*Plus

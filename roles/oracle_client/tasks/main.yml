@@ -16,8 +16,8 @@
     name:               common
     tasks_from:         add_new_install_dir.yml
   loop:
-    -                   "{{ oracle_client.inventory_location | dirname }}"
-    -                   "{{ oracle_client.oracle_base }}"
+    -                   "{{ oracle_vars.inventory_location | dirname }}"
+    -                   "{{ oracle_vars.oracle_base }}"
   loop_control:
     loop_var:           install_dir
     
@@ -30,7 +30,7 @@
 
 - name:                 "Set Facts for installation of Client Software"
   set_fact:
-    response_file:      "{{ oracle_client.oracle_base }}/client_install.rsp"
+    response_file:      "{{ oracle_vars.oracle_base }}/client_install.rsp"
 
 # --------------------- Create response file for silent installation
 
@@ -49,7 +49,7 @@
   command:              "{{ client_installer_loc }}/runInstaller -silent -noconfig -responseFile {{ response_file }} -waitforcompletion -ignorePrereq"
   args:
     chdir:              "{{ client_installer_loc }}"
-    creates:            "{{ oracle_client.oracle_home }}/*"
+    creates:            "{{ oracle_vars.oracle_home }}/*"
   register:             client_sw_install_result
   become:               yes
   become_user:          oracle
@@ -62,7 +62,7 @@
 # --------------------- Run root scripts
 
 - name:                 "Run orainstRoot.sh after Oracle Client 12.1.0.2 Software Installation"
-  command:              "{{ oracle_client.inventory_location }}/orainstRoot.sh"
+  command:              "{{ oracle_vars.inventory_location }}/orainstRoot.sh"
   register:             orainstRoot
   when:                 client_sw_install_result.stdout is search('/orainstRoot.sh')
   become:               yes
@@ -77,7 +77,7 @@
 # --------------------- Configure all tools
 
 - name:                 "Run configToolAllCommands after Oracle Client 12.1.0.2 Software Installation"
-  command:              "{{ oracle_client.oracle_home }}/cfgtoollogs/configToolAllCommands"
+  command:              "{{ oracle_vars.oracle_home }}/cfgtoollogs/configToolAllCommands"
   register:             configToolAllCommands
   when:                 client_sw_install_result.stdout is search('/cfgtoollogs/configToolAllCommands')
   become:               yes
@@ -97,7 +97,7 @@
     
 - name:                 "Set path of TNSNAMES file"
   set_fact:
-    tnsnames:           "{{ oracle_client.oracle_home }}/network/admin/tnsnames.ora"
+    tnsnames:           "{{ oracle_vars.oracle_home }}/network/admin/tnsnames.ora"
 
 # --------------------- Add aliases for DG databases
 
@@ -156,7 +156,7 @@
     path:               "/home/oracle/.bash_profile"
     insertafter:        "EOF"
     block: |
-      export ORACLE_HOME={{ oracle_client.oracle_home }}
+      export ORACLE_HOME={{ oracle_vars.oracle_home }}
       export PATH=${ORACLE_HOME}/bin:${PATH}
   become:               yes
   become_user:          oracle

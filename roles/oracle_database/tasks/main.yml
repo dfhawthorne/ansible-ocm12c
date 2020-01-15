@@ -9,7 +9,7 @@
   lineinfile:
     path:               /etc/oratab
     regexp:             '^jar:'
-    line:               "jar:/opt/app/oracle/product/12.1.0/dbhome_1:Y"
+    line:               "jar:{{ oracle_vars.oracle_home }}:Y"
     insertbefore:       EOF
   become:               yes
   become_user:          root

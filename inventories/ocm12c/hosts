@@ -57,6 +57,7 @@ redfern2.yaocm.id.au first_node=False
 
 # Oracle data guard nodes
 
-[oracle_dg]
+[oracle_data_guard]
+clifton.yaocm.id.au
 padstow.yaocm.id.au
 botany.yaocm.id.au
