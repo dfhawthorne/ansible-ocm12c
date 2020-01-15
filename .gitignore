@@ -3,5 +3,5 @@
 *.swp
 auburn.yml
 roles/oracle_user/vars/oracle_pw.yml
-roles/oracle_db/vars/oracle_pw.yml
+roles/oracle_database/vars/oracle_pw.yml
 roles/oracle_clustered_server/vars/oracle_pw.yml

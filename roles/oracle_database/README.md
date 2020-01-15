@@ -1,5 +1,5 @@
-ORACLE_DB
-=========
+ORACLE_DATABASE
+===============
 
 This role creates and configures the Oracle Database for a Linux server.
 
@@ -46,7 +46,7 @@ Dependencies
 Missing File
 ------------
 
-The file, `./roles/oracle_db/vars/oracle_pw.yml`, is *not* available in the online repository because it contains passwords. It has the following format:
+The file, `./roles/oracle_database/vars/oracle_pw.yml`, is *not* available in the online repository because it contains passwords. It has the following format:
 ```yml
 ---
 SYSPassword:            "pw"

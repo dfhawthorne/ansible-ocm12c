@@ -2,5 +2,5 @@
 - hosts:        padstow.yaocm.id.au
   roles:
     - oracle_standalone_server
-    - oracle_db
+    - oracle_database
 ...
