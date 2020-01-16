@@ -1,2 +1,29 @@
 ---
-# tasks file for oracle_data_guard
+# ------------------------------------------------------------------------------
+# Sets up a data guard environment
+# ------------------------------------------------------------------------------
+
+# -------------------- Define static listener entries
+
+- name:                "Define static listener entries"
+  blockinfile:
+    path:               "{{ oracle_vars.oracle_home }}/network/admin/listener.ora"
+    insertafter:        "EOF"
+    marker:             "# {mark} Static Listener Entries"
+    block: |
+      SID_LIST_LISTENER =
+        (SID_LIST =
+          (SID_DESC =
+            (GLOBAL_DBNAME = {{ oracle_vars.db_unique_name }}_DGMGRL.yaocm.id.au)
+            (ORACLE_HOME = {{ oracle_vars.oracle_home }})
+            (SID_NAME = {{ oracle_vars.sid_name }})
+          )
+        )
+
+  become:               yes
+  become_user:          oracle
+  when:                 oracle_vars["data_guard_role"] != "observer"
+  notify:
+  - restart oracle listener
+
+...

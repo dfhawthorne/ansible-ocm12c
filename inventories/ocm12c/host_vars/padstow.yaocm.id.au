@@ -18,5 +18,8 @@ oracle_dbca:
 oracle_vars:
   "inventory_location": "/opt/app/oraInventory"
   "oracle_base":        "/opt/app/oracle"
-  "oracle_home":        "/opt/app/oracle/product/12.1.0.2/dbhome_1"
+  "oracle_home":        "/opt/app/oracle/product/12.1.0/dbhome_1"
+  "data_guard_role":    "primary"
+  "db_unique_name":     "jar_padstow"
+  "sid_name":           "jar"
 ...

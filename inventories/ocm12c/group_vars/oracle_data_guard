@@ -2,13 +2,4 @@
 # ------------------------------------------------------------------------------
 # Variables for Oracle Data Guard configuration
 # ------------------------------------------------------------------------------
-oracle_data_guard:
-  primary:
-    host_name:          "padstow.yaocm.id.au"
-    db_unique_name:     "jar_padstow"
-  standby:
-    host_name:          "botany.yaocm.id.au"
-    db_unique_name:     "jar_botany"
-  observer:
-    host_name:          "clifton.yaocm.id.au"
 ...

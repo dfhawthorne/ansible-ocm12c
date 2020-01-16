@@ -1,2 +1,25 @@
 ---
 # handlers file for oracle_data_guard
+
+- name:                 stop oracle listener
+  shell:                "ORACLE_HOME={{ oracle_vars.oracle_home }} {{ oracle_vars.oracle_home }}/bin/lsnrctl stop"
+  args:
+    executable:         /bin/bash
+  listen:               "stop oracle listener"
+  become:               yes
+  become_user:          oracle
+
+- name:                 start oracle listener
+  shell:                "ORACLE_HOME={{ oracle_vars.oracle_home }} {{ oracle_vars.oracle_home }}/bin/lsnrctl start"
+  args:
+    executable:         /bin/bash
+  listen:               "start oracle listener" 
+  become:               yes
+  become_user:          oracle
+
+- name:                 restart oracle listener
+  command:              echo "this task will restart the Oracle listener"
+  notify:
+  - stop oracle listener
+  - start oracle listener
+...
