@@ -1,9 +1,0 @@
----
-# handlers file for oracle_gi
-- name:                 restart ntpd
-  service:
-    name:               ntpd
-    state:              restarted
-  become:               yes
-  become_user:          root
-...

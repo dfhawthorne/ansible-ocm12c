@@ -1,7 +1,10 @@
 ---
+# ------------------------------------------------------------------------------
+# Install necessary packages for Oracle ASMLib file system driver
+# -----------------------------------------------------------------------------
 - name: "Install Oracle ASMLib RPM"
   yum:
-    name: http://download.oracle.com/otn_software/asmlib/oracleasmlib-2.0.12-1.el7.x86_64.rpm
+    name: kmod-oracleasm
     state: present
 
 - name: "Install other packages for ASM"

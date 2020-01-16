@@ -1,0 +1,44 @@
+---
+# ------------------------------------------------------------------------------
+# Creates a Linux user called 'oracle' to own all of the software installed for
+#   Oracle database with optional installation of Grid Infrastructure (GI) and
+#   Automatic Storage Management (ASM).
+#
+# There are three (3) types of Linux groups for the software owner:
+# (1) Installation group
+# (2) ASM groups (also used for GI) - optional
+# (3) Database groups (always created and used)
+#
+# The last two (2) groups are created and added when required.
+#
+# The password for the software owner is loaded from an external file:
+#   roles/oracle_user/files/oracle_pw.yml
+#
+# A dictionary, called 'oracle_user', required. The default value is in:
+#   roles/oracle_user/vars/main.yml
+# ------------------------------------------------------------------------------
+
+# --------------------- Add Linux Groups
+
+- name:                 "Add Oracle Installation Group"
+  group: 
+    name:               "{{ oracle_user.install_group.name }}"
+    gid:                "{{ oracle_user.install_group.gid }}"
+    state:              present
+    system:             no
+
+# --------------------- Create Oracle User
+
+- name:                 "Load Oracle User Password"
+  include_vars:
+    file:               oracle_pw.yml
+    name:               oracle_user_pw
+
+- name:                 "Set default group and password for Oracle user"
+  user:
+    name:               oracle
+    comment:            "Oracle software owner"
+    password:           "{{ oracle_user_pw.password }}"
+    group:              "{{ oracle_user.install_group.name }}"
+
+...

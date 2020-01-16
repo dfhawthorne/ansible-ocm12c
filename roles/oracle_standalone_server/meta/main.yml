@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Douglas Hawthorne
+  description: Oracle DBA
+  company: NA
+
+  license: MIT
+
+  min_ansible_version: 2.6.3
+
+  platforms:
+  - name: OracleLinux
+    versions:
+    - 6
+    - 7
+
+  galaxy_tags: []
+
+dependencies: 
+  - role:               common
+  - role:               oracle_user
+  - role:               hugepages

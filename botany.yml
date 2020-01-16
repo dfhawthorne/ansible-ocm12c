@@ -1,0 +1,5 @@
+---
+- hosts:        botany.yaocm.id.au
+  roles:
+    - oracle_standalone_server
+...

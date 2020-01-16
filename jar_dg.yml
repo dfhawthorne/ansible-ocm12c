@@ -1,0 +1,9 @@
+---
+# ------------------------------------------------------------------------------
+# Simple Oracle data guard configuration for the JAR database
+# ------------------------------------------------------------------------------
+- hosts:                oracle_data_guard
+  roles:
+  -                     oracle_data_guard
+...
+

@@ -1,0 +1,9 @@
+---
+# vars file for oracle_clustered_server
+# Variables needed to install Oracle Grid Infrastructure (GI)
+"oracle_gi":
+  "inventory_location": "/opt/app/oraInventory"
+  "oracle_base":        "/opt/app/grid"
+  "crs_home":           "/opt/app/12.1.0/grid"
+  "cluvfy_home":        "/opt/app/12.1.0/cluvfy"
+...

@@ -1,0 +1,35 @@
+---
+# ------------------------------------------------------------------------------
+# Variables for Oracle Data Guard configuration
+# ------------------------------------------------------------------------------
+data_guard_vars:
+  tnsname_aliases: |
+    JAR_PADSTOW=(DESCRIPTION=
+      (ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))
+      (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jar_padstow.yaocm.id.au))
+      )
+      
+    JAR_BOTANY=(DESCRIPTION=
+      (ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))
+      (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jar_botany.yaocm.id.au))
+      )
+
+    PADSTOW_DG=(DESCRIPTION=
+      (ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))
+      (CONNECT_DATA=
+        (SERVICE_NAME=jar_padstow_DGMGRL.yaocm.id.au)
+        (INSTANCE_NAME=ocm12c)
+        (SERVER=DEDICATED)
+        )
+      )
+
+    BOTANY_DG=(DESCRIPTION=
+      (ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))
+      (CONNECT_DATA=
+        (SERVICE_NAME=jar_botany_DGMGRL.yaocm.id.au)
+        (INSTANCE_NAME=jar)
+        (SERVER=DEDICATED)
+        )
+      )
+
+...
