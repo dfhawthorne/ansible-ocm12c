@@ -3,6 +3,13 @@
 # Sets up a data guard environment
 # ------------------------------------------------------------------------------
 
+# -------------------- Include variables from Oracle User role
+
+- name:                "Include variables from Oracle User role"
+  include_vars:
+    dir:               ../../oracle_user/vars
+    files_matching:    main.yml
+
 # -------------------- Define static listener entries
 
 - name:                "Define static listener entries"
@@ -25,5 +32,20 @@
   when:                 oracle_vars["data_guard_role"] != "observer"
   notify:
   - restart oracle listener
+
+# --------------------- Add aliases for DG databases
+
+- name:                 "Add Data Guard aliases to TNSNAMES file"
+  blockinfile:
+    path:               "{{ oracle_vars.oracle_home }}/network/admin/tnsnames.ora"
+    create:             "yes"
+    group:              "{{ oracle_user.install_group.name }}"
+    mode:               0644
+    owner:              "oracle"
+    marker:             "# {mark} Data Guard Aliases"
+    block:              "{{ data_guard_vars.tnsname_aliases }}"
+    insertbefore:       EOF
+  become:               yes
+  become_user:          oracle
 
 ...
