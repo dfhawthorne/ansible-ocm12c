@@ -22,4 +22,6 @@ oracle_vars:
   "data_guard_role":    "primary"
   "db_unique_name":     "jar_padstow"
   "sid_name":           "jar"
+
+git_hub_access:         "git"
 ...

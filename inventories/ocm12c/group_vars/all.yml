@@ -27,4 +27,8 @@ first_node:             false
 # --------------------- Standard location of Oracle ASMLib command interface
 
 oracleasm_cmd:          "/sbin/oracleasm"
+
+# --------------------- Most cloning of GITHUB repositories is done via HTTPS
+
+git_hub_access:         "https"
 ...

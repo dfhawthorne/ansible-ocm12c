@@ -48,4 +48,28 @@
   become:               yes
   become_user:          oracle
 
+# --------------------- Refresh SQL scripts from GITHUB
+
+- include_role:
+    name:               common
+    tasks_from:         clone_sql_ocm12c.yml
+
+
+# --------------------- Get database settings off primary and standby nodes
+
+- name:                 "Get database settings"
+  command:
+    cmd:                "/bin/bash get_database_settings.sh jar {{ oracle_vars.oracle_home }}"
+    chdir:              "/home/oracle/sql-ocm12c/Data Guard/Create a physical standby database"
+  register:             database_settings
+  become:               yes
+  become_user:          oracle
+  changed_when:         false
+  failed_when:          false
+  when:                 oracle_vars["data_guard_role"] != "observer"
+
+- name:                 "Show database settings"
+  debug:
+    var:                database_settings.stdout_lines
+  when:                 database_settings is defined
 ...

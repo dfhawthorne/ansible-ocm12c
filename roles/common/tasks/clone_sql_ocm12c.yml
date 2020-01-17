@@ -1,11 +1,13 @@
 ---
 # ---------------------------------------------------------------------------
 # Clone the SQL-OCM12C repository from GitHub
+#
+# GITHUB repositories accessed via GIT protocol require manual cloning.
 # ---------------------------------------------------------------------------
 
 # --------------------- Get latest version of SQL Scripts from repository
  
-- name:                 "Get latest version of SQL Scripts from repository"
+- name:                 "Get latest version of SQL Scripts from repository using HTTPS"
   git:
     repo:               "https://github.com/dfhawthorne/sql-ocm12c.git"
     dest:               "/home/oracle/sql-ocm12c"
@@ -13,4 +15,16 @@
     update:             "yes"
   become:               yes
   become_user:          oracle
+  when:                 git_hub_access == "https"
+
+- name:                 "Get latest version of SQL Scripts from repository using GIT"
+  git:
+    repo:               "git@github.com:dfhawthorne/sql-ocm12c.git"
+    dest:               "/home/oracle/sql-ocm12c"
+    clone:              "no"
+    update:             "yes"
+  become:               yes
+  become_user:          oracle
+  when:                 git_hub_access == "git"
+
 ...
