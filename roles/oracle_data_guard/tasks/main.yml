@@ -72,4 +72,55 @@
   debug:
     var:                database_settings.stdout_lines
   when:                 database_settings is defined
+
+# --------------------- Check if the Primary database is ready to be configured as Data Guard
+
+- name:                 "Default flags for checking suitability of Primary for Data Guard"
+  set_fact:
+    change_primary_db_unique_name:
+                        false
+    change_primary_archivelog_mode:
+                        false
+    change_primary_force_logging:
+                        false
+    primary_db_unique_name_str:
+                        "db_unique_name={{ oracle_vars.db_unique_name }}\n"
+  when:                 oracle_vars["data_guard_role"] == "primary"
+
+- name:                 "Validate FORCE LOGGING setting for Primary database"
+  set_fact:
+    change_primary_force_logging:
+                        true
+  when:
+  - oracle_vars["data_guard_role"] == "primary"
+  - database_settings.stdout is not search("force_logging=YES")
+
+- name:                 "Validate ARCHIVELOG setting for Primary database"
+  set_fact:
+    change_primary_archivelog_mode:
+                        true
+  when:
+  - oracle_vars["data_guard_role"] == "primary"
+  - database_settings.stdout is not search("archivelog_mode=ARCHIVELOG")
+
+- name:                 "Validate DB_UNIQUE_NAME setting for Primary database"
+  set_fact:
+    change_primary_db_unique_name:
+                        true 
+  when:
+  - oracle_vars["data_guard_role"] == "primary"
+  - database_settings.stdout is not search(primary_db_unique_name_str)
+
+- debug:
+    var:
+      change_primary_db_unique_name
+  when:                 oracle_vars["data_guard_role"] == "primary"
+- debug:
+    var:
+      change_primary_archivelog_mode
+  when:                 oracle_vars["data_guard_role"] == "primary"
+- debug:
+    var:
+      change_primary_force_logging
+  when:                 oracle_vars["data_guard_role"] == "primary"
 ...
