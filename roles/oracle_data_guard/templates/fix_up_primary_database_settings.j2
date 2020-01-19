@@ -40,5 +40,38 @@ ALTER DATABASE FORCE LOGGING;
    Open database
    -------------------------------------------------------------------------- #}
 ALTER DATABASE OPEN;
+{# --------------------------------------------------------------------------
+   Change any dynamic initialisation parameters
+   -------------------------------------------------------------------------- #}
+{% if change_primary_log_archive_config %}
+ALTER SYSTEM
+    SET {{ primary_log_archive_config_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% endif %}
+{% if change_primary_log_archive_dest_1 %}
+ALTER SYSTEM
+    SET {{ primary_log_archive_dest_1_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% endif %}
+{% if change_primary_log_archive_dest_2 %}
+ALTER SYSTEM
+    SET {{ primary_log_archive_dest_2_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% endif %}
+{% if change_primary_log_archive_format %}
+ALTER SYSTEM
+    SET {{ primary_log_archive_format_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% endif %}
+{% if change_primary_remote_login_passwordfile %}
+ALTER SYSTEM
+    SET {{ primary_remote_login_passwordfile_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% endif %}
 EXIT
 DONE
