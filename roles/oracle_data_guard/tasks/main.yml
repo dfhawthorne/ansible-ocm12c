@@ -73,54 +73,80 @@
     var:                database_settings.stdout_lines
   when:                 database_settings is defined
 
-# --------------------- Check if the Primary database is ready to be configured as Data Guard
+# ------------------------------------------------------------------------------
+# Fix up settings on Primary database before creating the data guard standby
+# ------------------------------------------------------------------------------
 
-- name:                 "Default flags for checking suitability of Primary for Data Guard"
-  set_fact:
-    change_primary_db_unique_name:
+- name:                 "Fix up settings on Primary database before creating the data guard standby"
+  block:
+
+  # ------------------- Check if the Primary database is ready to be configured as Data Guard
+
+  - name:               "Default flags for checking suitability of Primary for Data Guard"
+    set_fact:
+      change_primary_db_unique_name:
                         false
-    change_primary_archivelog_mode:
+      change_primary_archivelog_mode:
                         false
-    change_primary_force_logging:
+      change_primary_force_logging:
                         false
-    primary_db_unique_name_str:
+      primary_db_unique_name_str:
                         "db_unique_name={{ oracle_vars.db_unique_name }}\n"
-  when:                 oracle_vars["data_guard_role"] == "primary"
 
-- name:                 "Validate FORCE LOGGING setting for Primary database"
-  set_fact:
-    change_primary_force_logging:
+  - name:               "Validate FORCE LOGGING setting for Primary database"
+    set_fact:
+      change_primary_force_logging:
                         true
-  when:
-  - oracle_vars["data_guard_role"] == "primary"
-  - database_settings.stdout is not search("force_logging=YES")
+    when:               database_settings.stdout is not search("force_logging=YES")
 
-- name:                 "Validate ARCHIVELOG setting for Primary database"
-  set_fact:
-    change_primary_archivelog_mode:
+  - name:               "Validate ARCHIVELOG setting for Primary database"
+    set_fact:
+      change_primary_archivelog_mode:
                         true
-  when:
-  - oracle_vars["data_guard_role"] == "primary"
-  - database_settings.stdout is not search("archivelog_mode=ARCHIVELOG")
+    when:                database_settings.stdout is not search("log_mode=ARCHIVELOG")
 
-- name:                 "Validate DB_UNIQUE_NAME setting for Primary database"
-  set_fact:
-    change_primary_db_unique_name:
+  - name:               "Validate DB_UNIQUE_NAME setting for Primary database"
+    set_fact:
+      change_primary_db_unique_name:
                         true 
-  when:
-  - oracle_vars["data_guard_role"] == "primary"
-  - database_settings.stdout is not search(primary_db_unique_name_str)
+    when:               database_settings.stdout is not search(primary_db_unique_name_str)
 
-- debug:
-    var:
-      change_primary_db_unique_name
-  when:                 oracle_vars["data_guard_role"] == "primary"
-- debug:
-    var:
-      change_primary_archivelog_mode
-  when:                 oracle_vars["data_guard_role"] == "primary"
-- debug:
-    var:
-      change_primary_force_logging
+  - debug:
+      var:
+        change_primary_db_unique_name
+  - debug:
+      var:
+        change_primary_archivelog_mode
+  - debug:
+      var:
+        change_primary_force_logging
+
+  # ------------------- Create and run fix up script
+
+  - name:               "Create and run fix up script"
+    block:
+
+    - name:             "Create fix up script for primary database"
+      template:
+        src:            fix_up_primary_database_settings.j2
+        dest:           /tmp/fix_up_primary_database_settings.sh
+
+    - name:             "Run data guard fix up script on primary databse instance"
+      command:          "/bin/bash /tmp/fix_up_primary_database_settings.sh"
+      register:         primary_data_guard_fix_up
+
+    - name:             "Display output from data guard fix up script on primary database instance"
+      debug:
+        var:            primary_data_guard_fix_up.stdout_lines
+
+    - name:             "Remove fix up script"
+      file:
+        path:           /tmp/fix_up_primary_database_settings.sh
+        state:          absent
+
+    when:               change_primary_force_logging or change_primary_archivelog_mode or change_primary_db_unique_name
+    become:             yes
+    become_user:        oracle
+
   when:                 oracle_vars["data_guard_role"] == "primary"
 ...

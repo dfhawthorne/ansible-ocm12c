@@ -1,0 +1,9 @@
+# ------------------------------------------------------------------------------
+# Bash script to fix settings that are incompatible with a Data Guard
+# environment.
+# ------------------------------------------------------------------------------
+
+export ORACLE_HOME={{ oracle_vars.oracle_home }}
+export ORACLE_SID={{ oracle_vars.sid_name }}
+
+{% set time_changed = iso_date|iso8601_to_time|datetimeformat('Y-%m-%d') %}

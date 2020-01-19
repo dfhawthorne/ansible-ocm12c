@@ -1,0 +1,44 @@
+# ------------------------------------------------------------------------------
+# Bash script to fix settings that are incompatible with a Data Guard
+# environment.
+# ------------------------------------------------------------------------------
+
+export ORACLE_HOME={{ oracle_vars.oracle_home }}
+export ORACLE_SID={{ oracle_vars.sid_name }}
+
+{{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
+WHENEVER SQLERROR EXIT FAILURE
+{# --------------------------------------------------------------------------
+   Force the database instance into a known state
+   -------------------------------------------------------------------------- #}
+SHUTDOWN IMMEDIATE
+{# --------------------------------------------------------------------------
+   Change any initialisation parameters that are not dymanic
+   -------------------------------------------------------------------------- #}
+{% if change_primary_db_unique_name %}
+STARTUP NOMOUNT
+ALTER SYSTEM
+    SET db_unique_name='{{ oracle_vars.db_unique_name }}'
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=SPFILE;
+{# Suppresses ORA-01507: database not mounted #}
+WHENEVER SQLERROR CONTINUE
+SHUTDOWN
+WHENEVER SQLERROR EXIT FAILURE
+{% endif %}
+{# --------------------------------------------------------------------------
+   Change database settings that are not dynamic
+   -------------------------------------------------------------------------- #}
+STARTUP MOUNT
+{% if change_primary_archivelog_mode %}
+ALTER DATABASE ARCHIVELOG;
+{% endif %}
+{% if change_primary_force_logging %}
+ALTER DATABASE FORCE LOGGING;
+{% endif %}
+{# --------------------------------------------------------------------------
+   Open database
+   -------------------------------------------------------------------------- #}
+ALTER DATABASE OPEN;
+EXIT
+DONE
