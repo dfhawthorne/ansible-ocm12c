@@ -1,0 +1,39 @@
+---
+- hosts:                padstow.yaocm.id.au
+  tasks:
+  - set_fact:
+      oracle_vars:
+        db_unique_name: "jar_padstow"
+        remote_db_unique_name:
+                        "jar_botany"
+        
+  - set_fact:
+      output:
+        stdout:         "log_archive_config='DG_CONFIG=(jar_padstow,jar_botany)'\nlog_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME=jar_padstow'\nlog_archive_dest_2='SERVICE=jar_botany ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=jar_botany'\nremote_login_passwordfile='EXCLUSIVE'\n"
+        stdout_lines:
+        - "log_archive_config='DG_CONFIG=(jar_padstow,jar_botany)'"
+        - "log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME=jar_padstow'"
+        - "log_archive_dest_2='SERVICE=jar_botany ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=jar_botany'"
+        - "remote_login_passwordfile='EXCLUSIVE'"
+      primary_remote_login_passwordfile_str:
+                        "remote_login_passwordfile='EXCLUSIVE'"
+      primary_log_archive_config_str:
+                        "log_archive_config='DG_CONFIG=\\({{ oracle_vars.db_unique_name }},{{ oracle_vars.remote_db_unique_name }}\\)'"
+
+  - set_fact:
+      change_primary_remote_login_passwordfile:
+                        "{{ output.stdout is not search(primary_remote_login_passwordfile_str) }}"
+      change_primary_log_archive_config:
+                        "{{ output.stdout is not search(primary_log_archive_config_str) }}"
+
+  - debug:
+      var:              output
+  - debug:
+      var:              primary_remote_login_passwordfile_str
+  - debug:
+      var:              primary_log_archive_config_str
+  - debug:
+      var:              change_primary_remote_login_passwordfile
+  - debug:
+      var:              change_primary_log_archive_config
+...

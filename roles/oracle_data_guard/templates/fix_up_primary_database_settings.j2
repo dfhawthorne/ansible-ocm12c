@@ -7,7 +7,13 @@ export ORACLE_HOME={{ oracle_vars.oracle_home }}
 export ORACLE_SID={{ oracle_vars.sid_name }}
 
 {{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
+{# --------------------------------------------------------------------------
+   Only shutdown if needed
+   -------------------------------------------------------------------------- #}
 WHENEVER SQLERROR EXIT FAILURE
+{% if change_primary_db_unique_name  or
+      change_primary_archivelog_mode or
+      change_primary_force_logging   %}
 {# --------------------------------------------------------------------------
    Force the database instance into a known state
    -------------------------------------------------------------------------- #}
@@ -18,7 +24,7 @@ SHUTDOWN IMMEDIATE
 {% if change_primary_db_unique_name %}
 STARTUP NOMOUNT
 ALTER SYSTEM
-    SET db_unique_name='{{ oracle_vars.db_unique_name }}'
+    SET {{ primary_db_unique_name_str }}
         COMMENT='Ansible changed $(date +"%Y-%m-%d")'
         SCOPE=SPFILE;
 {# Suppresses ORA-01507: database not mounted #}
@@ -40,6 +46,7 @@ ALTER DATABASE FORCE LOGGING;
    Open database
    -------------------------------------------------------------------------- #}
 ALTER DATABASE OPEN;
+{% endif %}
 {# --------------------------------------------------------------------------
    Change any dynamic initialisation parameters
    -------------------------------------------------------------------------- #}
