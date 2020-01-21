@@ -102,7 +102,7 @@
       primary_log_archive_dest_1_str:
                         "log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME={{ oracle_vars.db_unique_name }}'"
       primary_log_archive_dest_2_search_str:
-                        "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=\\(ONLINE_LOGFILES,PRIMARY_ROLE\\) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
+              "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=\\(ONLINE_LOGFILES,PRIMARY_ROLE\\) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
       primary_log_archive_dest_2_str:
                         "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
       primary_log_archive_format_str:
@@ -160,6 +160,35 @@
                         change_primary_log_archive_dest_2        or
                         change_primary_log_archive_format        or
                         change_primary_remote_login_passwordfile
+    become:             yes
+    become_user:        oracle
+
+  # ------------------- Backup Primary Database for Standby
+
+  - name:               "Backup Primary Database for Standby"
+    block:
+
+    - name:             "Create backup script for primary database"
+      template:
+        src:            backup_primary_database_for_dg.j2
+        dest:           /tmp/backup_primary_database_for_dg.sh
+
+    - name:             "Run backup script on primary databse instance"
+      command:          "/bin/bash /tmp/backup_primary_database_for_dg.sh"
+      register:         primary_data_guard_backup
+      failed_when:      >
+                        ( "RMAN-" in primary_data_guard_backup.stdout ) or
+                        ( "ORA-"  in primary_data_guard_backup.stdout )
+
+    - name:             "Display output from backup script on primary database instance"
+      debug:
+        var:            primary_data_guard_backup.stdout_lines
+
+    - name:             "Remove priamry database backup script"
+      file:
+        path:           /tmp/backup_primary_database_for_dg.sh
+        state:          absent
+
     become:             yes
     become_user:        oracle
 
