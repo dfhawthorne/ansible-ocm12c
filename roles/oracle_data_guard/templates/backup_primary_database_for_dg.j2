@@ -1,4 +1,3 @@
-#!/bin/sh
 # ------------------------------------------------------------------------------
 # Creates the files necessary to create a physical standby database by backing
 # up the primary database.
@@ -17,6 +16,8 @@ dest_host=${dest_db_unique_name##*_}
 # ------------------------------------------------------------------------------
 # Backup the primary database into the recovery area, and then backup the
 # recovery area into /tmp.
+# -----------------------------------------------------------------------------
+
 {{ oracle_vars.oracle_home }}/bin/rman target / <<DONE
   run {
     allocate channel d1 device type disk;
