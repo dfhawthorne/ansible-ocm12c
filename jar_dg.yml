@@ -1,8 +1,12 @@
 ---
 # ------------------------------------------------------------------------------
 # Simple Oracle data guard configuration for the JAR database
+#
+# Any errors encountered forces the entire playbook to abort because there are
+# sequential tasks that execute on different hosts.
 # ------------------------------------------------------------------------------
 - hosts:                oracle_data_guard
+  any_errors_fatal:     true
   roles:
   -                     oracle_data_guard
 ...

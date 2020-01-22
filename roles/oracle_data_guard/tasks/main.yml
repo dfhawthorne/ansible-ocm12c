@@ -184,7 +184,7 @@
       debug:
         var:            primary_data_guard_backup.stdout_lines
 
-    - name:             "Remove priamry database backup script"
+    - name:             "Remove primary database backup script"
       file:
         path:           /tmp/backup_primary_database_for_dg.sh
         state:          absent
@@ -193,4 +193,35 @@
     become_user:        oracle
 
   when:                 oracle_vars["data_guard_role"] == "primary"
+
+  # ------------------- Create Physical Standby Database
+
+- name:                 "Create Physical Standby Database"
+  block:
+
+  - name:               "Create script to build physical standby database"
+    template:
+      src:              restore_standby_database_for_dg.j2
+      dest:             /tmp/restore_standby_database_for_dg.sh
+
+  - name:               "Run script to build physical standby database"
+    command:            "/bin/bash /tmp/restore_standby_database_for_dg.sh"
+    register:           create_standby_data_guard
+    failed_when:        >
+                        ( "RMAN-" in create_standby_data_guard.stdout ) or
+                        ( "ORA-"  in create_standby_data_guard.stdout )
+
+  - name:               "Display output from script to build physical standby database"
+    debug:
+      var:              create_standby_data_guard.stdout_lines
+
+  - name:               "Remove script to build physical standby database"
+    file:
+      path:             /tmp/restore_standby_database_for_dg.sh
+      state:            absent
+
+  become:               yes
+  become_user:          oracle
+  when:                 oracle_vars["data_guard_role"] == "physical_standby"
+
 ...

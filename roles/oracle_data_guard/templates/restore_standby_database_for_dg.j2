@@ -1,0 +1,55 @@
+# ------------------------------------------------------------------------------
+# Restores the physical standby databse from the files backed up on the
+# primary database.
+#
+# The short homes are assumed to be the suffixes of the respective DB unique
+# names.
+# ------------------------------------------------------------------------------
+
+export ORACLE_HOME={{ oracle_vars.oracle_home }}
+export ORACLE_SID={{ oracle_vars.sid_name }}
+db_unique_name={{ oracle_vars.db_unique_name }}
+source_host=${db_unique_name##*_}
+
+# ------------------------------------------------------------------------------
+# Create the SPFILE from the editted copy created from the primary database
+# ------------------------------------------------------------------------------
+
+{{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
+startup nomount
+create spfile from pfile='/tmp/init${source_host}.ora';
+shutdown
+EXIT
+DONE
+
+# ------------------------------------------------------------------------------
+# Restore the standby control file
+# 
+# Refer to Mos Doc ID 734862.1:
+# "Step By Step Guide On How To Recreate Standby Control File When Datafiles Are
+# On ASM And Using Oracle Managed Files"
+# ------------------------------------------------------------------------------
+
+{{ oracle_vars.oracle_home }}/bin/rman target / <<DONE
+startup nomount
+restore standby controlfile from '/tmp/${source_host}.ctl';
+EXIT
+DONE
+
+# ------------------------------------------------------------------------------
+# Unzip the backup of the recovery area from the primary database
+# ------------------------------------------------------------------------------
+
+[ -r /tmp/${source_host}.gz ]                                          && \
+  tar xvzf /tmp/${source_host}.gz
+
+# ------------------------------------------------------------------------------
+# Mount and restore the physical standby database, then start the redo apply.
+# ------------------------------------------------------------------------------
+
+{{ oracle_vars.oracle_home }}/bin/rman target / <<DONE
+startup mount;
+restore database;
+alter database recover managed standby database disconnect from session;
+exit
+DONE

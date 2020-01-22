@@ -13,6 +13,15 @@ dest_db_unique_name={{ oracle_vars.remote_db_unique_name }}
 source_host=${db_unique_name##*_}
 dest_host=${dest_db_unique_name##*_}
 
+# -----------------------------------------------------------------------------
+# Delete any obsolete backups. The output is suppressed because of RMAN-08137
+# ------------------------------------------------------------------------------
+
+{{ oracle_vars.oracle_home }}/bin/rman target / >/dev/null <<DONE
+  delete noprompt obsolete;
+  exit
+DONE
+
 # ------------------------------------------------------------------------------
 # Backup the primary database into the recovery area, and then backup the
 # recovery area into /tmp.
@@ -56,12 +65,12 @@ sed                                                                       \
 # ------------------------------------------------------------------------------
 
 [ -d /tmp/${db_unique_name^^} ]                                        && \
-  tar cvzf /tmp/${source_host}.gz /tmp/${db_unique_name^^}
+  tar cvzf /tmp/${dest_host}.gz /tmp/${db_unique_name^^}
 [ -r /tmp/${dest_host}.ctl ]                                           && \
   scp /tmp/${dest_host}.ctl ${dest_host}:/tmp
 [ -r /tmp/init${dest_host}.ora ]                                       && \
   scp /tmp/init${dest_host}.ora ${dest_host}:/tmp
-[ -r /tmp/${source_host}.gz ]                                          && \
-  scp /tmp/${source_host}.gz ${dest_host}:/tmp
+[ -r /tmp/${dest_host}.gz ]                                            && \
+  scp /tmp/${dest_host}.gz ${dest_host}:/tmp
 scp {{ oracle_vars.oracle_home }}/dbs/orapw{{ oracle_vars.sid_name }}     \
   ${dest_host}:{{ oracle_vars.oracle_home }}/dbs
