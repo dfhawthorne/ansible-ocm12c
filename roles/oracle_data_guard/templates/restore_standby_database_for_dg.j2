@@ -16,11 +16,26 @@ source_host=${db_unique_name##*_}
 # ------------------------------------------------------------------------------
 
 {{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
-startup nomount
+startup nomount pfile='/tmp/init${source_host}.ora'
 create spfile from pfile='/tmp/init${source_host}.ora';
-shutdown
 EXIT
 DONE
+
+# ------------------------------------------------------------------------------
+# Shutdown database instance (and suppress any error messages)
+# -----------------------------------------------------------------------------
+
+{{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba >/dev/null <<DONE
+SHUTDOWN
+EXIT
+DONE
+
+# ------------------------------------------------------------------------------
+# Unzip the backup of the recovery area from the primary database
+# ------------------------------------------------------------------------------
+
+[ -r /tmp/${source_host}.gz ]                                          && \
+  tar --extract --gzip --file=/tmp/${source_host}.gz --directory=/
 
 # ------------------------------------------------------------------------------
 # Restore the standby control file
@@ -37,19 +52,13 @@ EXIT
 DONE
 
 # ------------------------------------------------------------------------------
-# Unzip the backup of the recovery area from the primary database
-# ------------------------------------------------------------------------------
-
-[ -r /tmp/${source_host}.gz ]                                          && \
-  tar xvzf /tmp/${source_host}.gz
-
-# ------------------------------------------------------------------------------
 # Mount and restore the physical standby database, then start the redo apply.
 # ------------------------------------------------------------------------------
 
 {{ oracle_vars.oracle_home }}/bin/rman target / <<DONE
-startup mount;
-restore database;
+ALTER DATABASE MOUNT;
+CROSSCHECK BACKUP;
+RESTORE DATABASE;
 alter database recover managed standby database disconnect from session;
 exit
 DONE

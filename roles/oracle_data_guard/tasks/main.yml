@@ -102,13 +102,17 @@
       primary_log_archive_dest_1_str:
                         "log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME={{ oracle_vars.db_unique_name }}'"
       primary_log_archive_dest_2_search_str:
-              "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=\\(ONLINE_LOGFILES,PRIMARY_ROLE\\) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
+                        "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=\\(ONLINE_LOGFILES,PRIMARY_ROLE\\) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
       primary_log_archive_dest_2_str:
                         "log_archive_dest_2='SERVICE={{ oracle_vars.remote_db_unique_name }} ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME={{ oracle_vars.remote_db_unique_name }}'"
       primary_log_archive_format_str:
                         "log_archive_format='%t_%s_%r.dbf'"
       primary_remote_login_passwordfile_str:
                         "remote_login_passwordfile='EXCLUSIVE'"
+      primary_fal_server_str:
+                        "fal_server='{{ oracle_vars.remote_db_unique_name }}'"
+      primary_standby_file_management_str:
+                        "standby_file_management='AUTO'"
 
   - name:               "Set flags for validity of various database settings"
     set_fact:
@@ -128,6 +132,10 @@
                         "{{ database_settings.stdout is not search(primary_log_archive_format_str) }}"
       change_primary_remote_login_passwordfile:
                         "{{ database_settings.stdout is not search(primary_remote_login_passwordfile_str) }}"
+      change_primary_fal_server:
+                        "{{ database_settings.stdout is not search(primary_fal_server_str) }}"
+      change_standby_file_management:
+                        "{{ database_settings.stdout is not search(primary_standby_file_management_str) }}"
 
   # ------------------- Create and run fix up script for database settings
 
@@ -159,7 +167,9 @@
                         change_primary_log_archive_dest_1        or
                         change_primary_log_archive_dest_2        or
                         change_primary_log_archive_format        or
-                        change_primary_remote_login_passwordfile
+                        change_primary_remote_login_passwordfile or
+                        change_primary_fal_server                or
+                        change_primary_standby_file_management
     become:             yes
     become_user:        oracle
 

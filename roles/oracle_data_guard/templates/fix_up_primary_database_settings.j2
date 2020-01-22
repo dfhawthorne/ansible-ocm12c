@@ -79,6 +79,16 @@ ALTER SYSTEM
     SET {{ primary_remote_login_passwordfile_str }}
         COMMENT='Ansible changed $(date +"%Y-%m-%d")'
         SCOPE=BOTH;
+{% if change_primary_fal_server %}
+ALTER SYSTEM
+    SET {{ primary_fal_server_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
+{% if change_primary_standby_file_management %}
+ALTER SYSTEM
+    SET {{ primary_standby_file_management_str }}
+        COMMENT='Ansible changed $(date +"%Y-%m-%d")'
+        SCOPE=BOTH;
 {% endif %}
 EXIT
 DONE
