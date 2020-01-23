@@ -134,7 +134,7 @@
                         "{{ database_settings.stdout is not search(primary_remote_login_passwordfile_str) }}"
       change_primary_fal_server:
                         "{{ database_settings.stdout is not search(primary_fal_server_str) }}"
-      change_standby_file_management:
+      change_primary_standby_file_management:
                         "{{ database_settings.stdout is not search(primary_standby_file_management_str) }}"
 
   # ------------------- Create and run fix up script for database settings

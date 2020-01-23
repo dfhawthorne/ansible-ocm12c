@@ -14,6 +14,17 @@ source_host=${db_unique_name##*_}
 dest_host=${dest_db_unique_name##*_}
 
 # -----------------------------------------------------------------------------
+# Remove old files (if any)
+# -----------------------------------------------------------------------------
+
+[ -f /tmp/${dest_host}.ctl ]          && \
+  rm -f /tmp/${dest_host}.ctl
+[ -f /tmp/init${source_host}.ora ]    && \
+  rm -f /tmp/init${source_host}.ora
+[ -f /tmp/init${dest_host}.ora ]      && \
+  rm -f /tmp/init${dest_host}.ora
+
+# -----------------------------------------------------------------------------
 # Delete any obsolete backups. The output is suppressed because of RMAN-08137
 # ------------------------------------------------------------------------------
 
@@ -49,19 +60,26 @@ DONE
 
 # ------------------------------------------------------------------------------
 # Change the text version of the SPFILE for use on the other node.
+# Get rid of automatic settings.
+# Remove control file names. These will be different on the standby.
+# Change the source of missing logs back to primary.
+# Change the DB_UNIQUE_NAME.
+# Flip the DB_UNIQUE_NAMEs for the log archive destinations.
 # ------------------------------------------------------------------------------
 
-sed                                                                       \
-  -e '/^ocm12\.__/d'                                                      \
-  -e '/^\*\.control_files=/d'                                             \
-  -e '/^\*\.fal_server=/s/${dest_host}/${source_host}/g'                  \
-  -e '/^\*\.db_unique_name=/s/${db_unique_name}/${dest_db_unique_name}/g' \
-  /tmp/init${source_host}.ora                                             \
+sed                                                                           \
+  -e "/^${ORACLE_SID}\.__/d"                                                  \
+  -e "/^\*\.control_files=/d"                                                 \
+  -e "/^\*\.fal_server=/s/${dest_host}/${source_host}/g"                      \
+  -e "/^\*\.db_unique_name=/s/${db_unique_name}/${dest_db_unique_name}/g"     \
+  -e "/^\*\.log_archive_dest_1=/s/${db_unique_name}/${dest_db_unique_name}/g" \
+  -e "/^\*\.log_archive_dest_2=/s/${dest_db_unique_name}/${db_unique_name}/g" \
+  /tmp/init${source_host}.ora                                                 \
   >/tmp/init${dest_host}.ora
 
 # ------------------------------------------------------------------------------
-# Copy the backups, password file, modified init.ora, and standby control to
-# the destination host.
+# Copy the backups, password file, modified init.ora, and standby control file
+# to the destination host.
 # ------------------------------------------------------------------------------
 
 [ -d /tmp/${db_unique_name^^} ]                                        && \
