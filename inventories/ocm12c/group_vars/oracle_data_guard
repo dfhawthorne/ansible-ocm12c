@@ -18,7 +18,7 @@ data_guard_vars:
       (ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))
       (CONNECT_DATA=
         (SERVICE_NAME=jar_padstow_DGMGRL.yaocm.id.au)
-        (INSTANCE_NAME=ocm12c)
+        (INSTANCE_NAME=jar)
         (SERVER=DEDICATED)
         )
       )
@@ -32,4 +32,16 @@ data_guard_vars:
         )
       )
 
+  primary:
+    host_name:          padstow.yaocm.id.au
+    db_unique_name:     jar_padstow
+    tns_alias:          jar_padstow
+    sid_name:           jar
+  standby:
+    host_name:          botany.yaocm.id.au
+    db_unique_name:     jar_botany
+    tns_alias:          jar_botany
+    sid_name:           jar
+  observer:
+    host_name:          clifton.yaocm.id.au
 ...
