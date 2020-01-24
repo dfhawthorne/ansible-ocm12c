@@ -99,5 +99,6 @@
     state:              latest
   become:               yes
   become_user:          root
+  when:                 ansible_distribution == "OracleLinux"
   tags:                 install_git
 ...
