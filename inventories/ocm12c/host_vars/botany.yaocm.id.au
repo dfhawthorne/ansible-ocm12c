@@ -6,9 +6,10 @@ oracle_vars:
   "inventory_location": "/opt/app/oraInventory"
   "oracle_base":        "/opt/app/oracle"
   "oracle_home":        "/opt/app/oracle/product/12.1.0/dbhome_1"
-  "data_guard_role":    "physical_standby"
-  "db_unique_name":     "jar_botany"
-  "sid_name":           "jar"
 
 git_hub_access:         "git"
+
+# --------------------- Set number of required Huge Pages
+
+num_huge_pages:         800
 ...

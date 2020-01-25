@@ -2,46 +2,75 @@
 # ------------------------------------------------------------------------------
 # Variables for Oracle Data Guard configuration
 # ------------------------------------------------------------------------------
-data_guard_vars:
-  tnsname_aliases: |
-    JAR_PADSTOW=(DESCRIPTION=
-      (ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))
-      (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jar_padstow.yaocm.id.au))
-      )
-      
-    JAR_BOTANY=(DESCRIPTION=
-      (ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))
-      (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jar_botany.yaocm.id.au))
-      )
 
-    PADSTOW_DG=(DESCRIPTION=
-      (ADDRESS=(PROTOCOL=TCP)(HOST=padstow.yaocm.id.au)(PORT=1521))
-      (CONNECT_DATA=
-        (SERVICE_NAME=jar_padstow_DGMGRL.yaocm.id.au)
-        (INSTANCE_NAME=jar)
-        (SERVER=DEDICATED)
-        )
-      )
-
-    BOTANY_DG=(DESCRIPTION=
-      (ADDRESS=(PROTOCOL=TCP)(HOST=botany.yaocm.id.au)(PORT=1521))
-      (CONNECT_DATA=
-        (SERVICE_NAME=jar_botany_DGMGRL.yaocm.id.au)
-        (INSTANCE_NAME=jar)
-        (SERVER=DEDICATED)
-        )
-      )
-
+data_guard_config:
+  db_domain:            yaocm.id.au
+  listener_port:        1521
   primary:
     host_name:          padstow.yaocm.id.au
     db_unique_name:     jar_padstow
-    tns_alias:          jar_padstow
+    dflt_tns_alias:     jar_padstow
+    dg_tns_alias:       dg_padstow
     sid_name:           jar
   standby:
     host_name:          botany.yaocm.id.au
     db_unique_name:     jar_botany
-    tns_alias:          jar_botany
+    dflt_tns_alias:     jar_botany
+    dg_tns_alias:       dg_botany
     sid_name:           jar
   observer:
     host_name:          clifton.yaocm.id.au
+
+data_guard_vars:
+  tnsname_aliases: |
+    {{ data_guard_config.primary.dflt_tns_alias }}=(DESCRIPTION=
+      (ADDRESS=
+        (PROTOCOL=TCP)
+        (HOST={{ data_guard_config.primary.host_name }})
+        (PORT={{ data_guard_config.listener_port }})
+        )
+      (CONNECT_DATA=
+        (SERVER=DEDICATED)
+        (SERVICE_NAME={{ data_guard_config.primary.db_unique_name }}.{{ data_guard_config.db_domain }})
+        )
+      )
+      
+    {{ data_guard_config.standby.dflt_tns_alias }}=(DESCRIPTION=
+      (ADDRESS=
+        (PROTOCOL=TCP)
+        (HOST={{ data_guard_config.standby.host_name }})
+        (PORT={{ data_guard_config.listener_port }})
+        )
+      (CONNECT_DATA=
+        (SERVER=DEDICATED)
+        (SERVICE_NAME={{ data_guard_config.standby.db_unique_name }}.{{ data_guard_config.db_domain }})
+        )
+      )
+
+    {{ data_guard_config.primary.dg_tns_alias }}=(DESCRIPTION=
+      (ADDRESS=
+        (PROTOCOL=TCP)
+        (HOST={{ data_guard_config.primary.host_name }})
+        (PORT={{ data_guard_config.listener_port }})
+        )
+      (CONNECT_DATA=
+        (SERVICE_NAME={{ data_guard_config.primary.db_unique_name }}_DGMGRL.{{ data_guard_config.db_domain }})
+        (INSTANCE_NAME={{ data_guard_config.primary.sid_name }})
+        (SERVER=DEDICATED)
+        )
+      )
+
+    {{ data_guard_config.standby.dg_tns_alias }}=(DESCRIPTION=
+      (ADDRESS=
+        (PROTOCOL=TCP)
+        (HOST={{ data_guard_config.standby.host_name }})
+        (PORT={{ data_guard_config.listener_port }})
+        )
+      (CONNECT_DATA=
+        (SERVICE_NAME={{ data_guard_config.standby.db_unique_name }}_DGMGRL.{{ data_guard_config.db_domain }})
+        (INSTANCE_NAME={{ data_guard_config.standby.sid_name }})
+        (SERVER=DEDICATED)
+        )
+      )
+
 ...

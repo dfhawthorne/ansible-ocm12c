@@ -7,9 +7,9 @@
 # ------------------------------------------------------------------------------
 
 export ORACLE_HOME={{ oracle_vars.oracle_home }}
-export ORACLE_SID={{ oracle_vars.sid_name }}
-db_unique_name={{ oracle_vars.db_unique_name }}
-source_host=${db_unique_name##*_}
+export ORACLE_SID={{ data_guard_config.standby.sid_name }}
+db_unique_name={{ data_guard_config.standby.db_unique_name }}
+source_host={{ data_guard_config.standby.host_name.split('.')[0] }}
 
 # ------------------------------------------------------------------------------
 # Create the SPFILE from the editted copy created from the primary database

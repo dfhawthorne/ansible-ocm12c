@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+  - include_vars: /etc/ansible/ansible-ocm12c/inventories/ocm12c/group_vars/oracle_data_guard
+  - debug:
+      var: data_guard_config
+  - debug:
+      var: data_guard_vars
+  - debug:
+      var: inventory_hostname
+...

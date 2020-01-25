@@ -1,17 +1,16 @@
 # ------------------------------------------------------------------------------
 # Creates the files necessary to create a physical standby database by backing
 # up the primary database.
-#
-# The short homes are assumed to be the suffixes of the respective DB unique
-# names.
 # ------------------------------------------------------------------------------
 
 export ORACLE_HOME={{ oracle_vars.oracle_home }}
-export ORACLE_SID={{ oracle_vars.sid_name }}
-db_unique_name={{ oracle_vars.db_unique_name }}
-dest_db_unique_name={{ oracle_vars.remote_db_unique_name }}
-source_host=${db_unique_name##*_}
-dest_host=${dest_db_unique_name##*_}
+export ORACLE_SID={{ data_guard_config.primary.sid_name }}
+db_unique_name={{ data_guard_config.primary.db_unique_name }}
+dest_db_unique_name={{ data_guard_config.standby.db_unique_name }}
+src_tns_alias={{ data_guard_config.primary.dflt_tns_alias }}
+dest_tns_alias={{ data_guard_config.standby.dflt_tns_alias }}
+source_host={{ data_guard_config.primary.host_name.split('.')[0] }}
+dest_host={{ data_guard_config.standby.host_name.split('.')[0] }}
 
 # -----------------------------------------------------------------------------
 # Remove old files (if any)
@@ -70,10 +69,11 @@ DONE
 sed                                                                           \
   -e "/^${ORACLE_SID}\.__/d"                                                  \
   -e "/^\*\.control_files=/d"                                                 \
-  -e "/^\*\.fal_server=/s/${dest_host}/${source_host}/g"                      \
+  -e "/^\*\.fal_server=/s/${dest_tns_alias}/${src_tns_alias}/g"               \
   -e "/^\*\.db_unique_name=/s/${db_unique_name}/${dest_db_unique_name}/g"     \
   -e "/^\*\.log_archive_dest_1=/s/${db_unique_name}/${dest_db_unique_name}/g" \
-  -e "/^\*\.log_archive_dest_2=/s/${dest_db_unique_name}/${db_unique_name}/g" \
+  -e "/^\*\.log_archive_dest_2=/s/DB_UNIQUE_NAME=${dest_db_unique_name}/DB_UNIQUE_NAME=${db_unique_name}/g" \
+  -e "/^\*\.log_archive_dest_2=/s/SERVICE=${dest_tns_alias}/SERVICE=${src_tns_alias}/g" \
   /tmp/init${source_host}.ora                                                 \
   >/tmp/init${dest_host}.ora
 
@@ -90,5 +90,5 @@ sed                                                                           \
   scp /tmp/init${dest_host}.ora ${dest_host}:/tmp
 [ -r /tmp/${dest_host}.gz ]                                            && \
   scp /tmp/${dest_host}.gz ${dest_host}:/tmp
-scp {{ oracle_vars.oracle_home }}/dbs/orapw{{ oracle_vars.sid_name }}     \
-  ${dest_host}:{{ oracle_vars.oracle_home }}/dbs
+scp {{ oracle_vars.oracle_home }}/dbs/orapw{{ data_guard_config.primary.sid_name }}     \
+  ${dest_host}:{{ oracle_vars.oracle_home }}/dbs/orapw{{ data_guard_config.standby.sid_name }}
