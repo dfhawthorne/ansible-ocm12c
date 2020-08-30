@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------------
 
 export ORACLE_HOME={{ oracle_vars.oracle_home }}
-export ORACLE_SID={{ oracle_vars.sid_name }}
+export ORACLE_SID={{ data_guard_config.primary.sid_name }}
 
 {{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
 {# --------------------------------------------------------------------------
