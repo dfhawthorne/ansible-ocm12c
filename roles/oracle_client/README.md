@@ -25,7 +25,7 @@ Including an example of how to use your role (for instance, with variables passe
 ```yml
     - hosts: servers
       roles:
-         - oracle_standalone_server
+         - oracle_client
 ```
 
 License
