@@ -31,7 +31,7 @@ UNIX_GROUP_NAME={{ oracle_user.install_group.name }}
 #-------------------------------------------------------------------------------
 # Inventory location.
 #-------------------------------------------------------------------------------
-INVENTORY_LOCATION={{ oracle_client.inventory_location }}
+INVENTORY_LOCATION={{ oracle_vars.inventory_location }}
 #-------------------------------------------------------------------------------
 # Specify the languages in which the components will be installed.             
 #
@@ -72,12 +72,12 @@ SELECTED_LANGUAGES=en
 #-------------------------------------------------------------------------------
 # Complete path of the Oracle Home
 #-------------------------------------------------------------------------------  
-ORACLE_HOME={{ oracle_client.oracle_home }}
+ORACLE_HOME={{ oracle_vars.oracle_home }}
 
 #-------------------------------------------------------------------------------
 # Complete path of the Oracle Base.
 #-------------------------------------------------------------------------------
-ORACLE_BASE={{ oracle_client.oracle_base }}
+ORACLE_BASE={{ oracle_vars.oracle_base }}
 
 #------------------------------------------------------------------------------
 #Name       : INSTALL_TYPE
