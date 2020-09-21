@@ -77,7 +77,7 @@
 # --------------------- Configure all tools
 
 - name:                 "Run configToolAllCommands after Oracle Client 12.1.0.2 Software Installation"
-  command:              "{{ oracle_vars.oracle_home }}/cfgtoollogs/configToolAllCommands"
+  command:              "/bin/sh {{ oracle_vars.oracle_home }}/cfgtoollogs/configToolAllCommands"
   register:             configToolAllCommands
   when:                 client_sw_install_result.stdout is search('/cfgtoollogs/configToolAllCommands')
   become:               yes
