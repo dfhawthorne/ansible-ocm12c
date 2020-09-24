@@ -1,0 +1,17 @@
+---
+# ------------------------------------------------------------------------------
+# Shut down multiple hosts
+# ------------------------------------------------------------------------------
+- hosts:
+    -                   botany.yaocm.id.au
+    -                   clifton.yaocm.id.au
+    -                   padstow.yaocm.id.au
+    -                   redfern1.yaocm.id.au
+    -                   redfern2.yaocm.id.au
+  tasks:
+    - name:             "Shutdown host"
+      command:          shutdown -h now
+      become:           yes
+      become_user:      root
+...
+
