@@ -1,6 +1,12 @@
+---
 # ------------------------------------------------------------------------------
 # Server specific variables for PADSTOW.YAOCM.ID.AU
 # ------------------------------------------------------------------------------
+
+# --------------------- Discovered Python for Ansible 2.10+
+
+ansible_python_interpreter: 
+                        "/usr/bin/python"
 
 # --------------------- Database configuration parameters
 

@@ -1,4 +1,9 @@
 ---
+# --------------------- Discovered Python for Ansible 2.10+
+
+ansible_python_interpreter:
+                        "/usr/bin/python"
+
 # ------------------------------------------------------------------------------
 # Server specific variables for BOTANY.YAOCM.ID.AU
 # ------------------------------------------------------------------------------
