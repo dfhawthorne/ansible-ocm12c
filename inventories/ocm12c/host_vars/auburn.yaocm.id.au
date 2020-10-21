@@ -1,0 +1,10 @@
+---
+# ------------------------------------------------------------------------------
+# Server specific variables for CLIFTON.YAOCM.ID.AU
+# ------------------------------------------------------------------------------
+
+# --------------------- Discovered Python for Ansible 2.10+
+
+ansible_python_interpreter: 
+                        "/usr/bin/python3"
+...
