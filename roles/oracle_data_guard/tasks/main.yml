@@ -3,6 +3,21 @@
 # Sets up a data guard environment
 # ------------------------------------------------------------------------------
 
+# -------------------- Get available space for file system where the ORACLE_BASE
+#                      is defined.
+
+- name:                "Find file system mount point for {{ oracle_vars.oracle_base }}"
+  set_fact:
+    mount_point:       "{{(ansible_facts.mounts | selectattr('mount', 'in', oracle_vars.oracle_base) | list | sort(attribute='mount'))[-1]}}"
+
+- name:                "Calculate amount of free space in GB for {{ oracle_vars.oracle_base }}"
+  set_fact:
+    space_available_in_gb: "{{ (mount_point.size_available | int / 1024 / 1024 / 1024) | round }}"
+
+- name:                "Display free space (GB) for {{ oracle_vars.oracle_base }}"
+  debug:
+    var: space_available_in_gb
+
 # -------------------- Include variables from Oracle User role
 
 - name:                "Include variables from Oracle User role"
@@ -10,257 +25,73 @@
     dir:               ../../oracle_user/vars
     files_matching:    main.yml
 
-# -------------------- Define static listener entries on primary
-
-- name:                "Define static listener entries on primary"
-  blockinfile:
-    path:               "{{ oracle_vars.oracle_home }}/network/admin/listener.ora"
-    insertafter:        "EOF"
-    marker:             "# {mark} Static Listener Entries"
-    block: |
-      SID_LIST_LISTENER =
-        (SID_LIST =
-          (SID_DESC =
-            (GLOBAL_DBNAME = {{ data_guard_config.primary.db_unique_name }}_DGMGRL.{{ data_guard_config.db_domain }} )
-            (ORACLE_HOME = {{ oracle_vars.oracle_home }})
-            (SID_NAME = {{ data_guard_config.primary.sid_name }})
-          )
-        )
-
-  become:               yes
-  become_user:          oracle
-  when:                 data_guard_config["primary"]["host_name"] == inventory_hostname
-  notify:
-  - restart oracle listener
-
-# -------------------- Define static listener entries on standby
-
-- name:                "Define static listener entries on standby"
-  blockinfile:
-    path:               "{{ oracle_vars.oracle_home }}/network/admin/listener.ora"
-    insertafter:        "EOF"
-    marker:             "# {mark} Static Listener Entries"
-    block: |
-      SID_LIST_LISTENER =
-        (SID_LIST =
-          (SID_DESC =
-            (GLOBAL_DBNAME = {{ data_guard_config.standby.db_unique_name }}_DGMGRL.{{ data_guard_config.db_domain }} )
-            (ORACLE_HOME = {{ oracle_vars.oracle_home }})
-            (SID_NAME = {{ data_guard_config.standby.sid_name }})
-          )
-        )
-
-  become:               yes
-  become_user:          oracle
-  when:                 data_guard_config["standby"]["host_name"] == inventory_hostname
-  notify:
-  - restart oracle listener
-
-# --------------------- Add aliases for DG databases
-
-- name:                 "Add Data Guard aliases to TNSNAMES file"
-  blockinfile:
-    path:               "{{ oracle_vars.oracle_home }}/network/admin/tnsnames.ora"
-    create:             "yes"
-    group:              "{{ oracle_user.install_group.name }}"
-    mode:               0644
-    owner:              "oracle"
-    marker:             "# {mark} Data Guard Aliases"
-    block:              "{{ data_guard_vars.tnsname_aliases }}"
-    insertbefore:       EOF
-  become:               yes
-  become_user:          oracle
-
 # --------------------- Refresh SQL scripts from GITHUB
 
 - include_role:
     name:               common
     tasks_from:         clone_sql_ocm12c.yml
 
+# --------------------- Get database status of standby nodes
 
-# --------------------- Get database settings off primary and standby nodes
-
-- name:                 "Get database settings"
-  command:
-    cmd:                "/bin/bash get_database_settings.sh jar {{ oracle_vars.oracle_home }}"
-    chdir:              "/home/oracle/sql-ocm12c/Data Guard/Create a physical standby database"
-  register:             database_settings
-  become:               yes
-  become_user:          oracle
-  changed_when:         false
-  failed_when:          false
-  when:                 data_guard_config["primary"]["host_name"] == inventory_hostname or
-                        data_guard_config["standby"]["host_name"] == inventory_hostname
-
-- name:                 "Show database settings"
-  debug:
-    var:                database_settings.stdout_lines
-  when:                 database_settings is defined
-
-# ------------------------------------------------------------------------------
-# Fix up settings on Primary database before creating the data guard standby
-# ------------------------------------------------------------------------------
-
-- name:                 "Fix up settings on Primary database before creating the data guard standby"
+- name:                 "Get database status of standby nodes"
   block:
 
-  # ------------------- Check if the Primary database is ready to be configured as Data Guard
-  #
-  #                     For any strings that have parentheses, there needs to be a search string with
-  #                     parentheses preceded by '\\', and a subsitution string that does not have
-  #                     these parentheses escaped.
-  #
-  #                     For all other cases, the same string can serve as both the search and
-  #                     subsitution string.
-
-  - name:               "Expected settings for Primary Data Guard Database"
-    set_fact:
-      primary_db_unique_name_str:
-                        "db_unique_name='{{ data_guard_config.primary.db_unique_name }}'"
-      primary_log_archive_config_search_str:
-                        "log_archive_config='DG_CONFIG=\\({{ data_guard_config.primary.db_unique_name }},{{ data_guard_config.standby.db_unique_name }}\\)'"
-      primary_log_archive_config_str:
-                        "log_archive_config='DG_CONFIG=({{ data_guard_config.primary.db_unique_name }},{{ data_guard_config.standby.db_unique_name }})'"
-      primary_log_archive_dest_1_search_str:
-                        "log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=\\(ALL_LOGFILES,ALL_ROLES\\) DB_UNIQUE_NAME={{ data_guard_config.primary.db_unique_name }}'"
-      primary_log_archive_dest_1_str:
-                        "log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST VALID_FOR=(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME={{ data_guard_config.primary.db_unique_name }}'"
-      primary_log_archive_dest_2_search_str:
-                        "log_archive_dest_2='SERVICE={{ data_guard_config.standby.dflt_tns_alias }} ASYNC VALID_FOR=\\(ONLINE_LOGFILES,PRIMARY_ROLE\\) DB_UNIQUE_NAME={{ data_guard_config.standby.db_unique_name }}'"
-      primary_log_archive_dest_2_str:
-                        "log_archive_dest_2='SERVICE={{ data_guard_config.standby.dflt_tns_alias }} ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME={{ data_guard_config.standby.db_unique_name }}'"
-      primary_log_archive_format_str:
-                        "log_archive_format='%t_%s_%r.dbf'"
-      primary_remote_login_passwordfile_str:
-                        "remote_login_passwordfile='EXCLUSIVE'"
-      primary_fal_server_str:
-                        "fal_server='{{ data_guard_config.standby.dflt_tns_alias }}'"
-      primary_standby_file_management_str:
-                        "standby_file_management='AUTO'"
-
-  - name:               "Set flags for validity of various database settings"
-    set_fact:
-      change_primary_db_unique_name:
-                        "{{ database_settings.stdout is not search(primary_db_unique_name_str) }}"
-      change_primary_archivelog_mode:
-                        "{{ database_settings.stdout is not search(\"log_mode='ARCHIVELOG'\") }}"
-      change_primary_force_logging:
-                        "{{ database_settings.stdout is not search(\"force_logging='YES'\") }}"
-      change_primary_log_archive_config:
-                        "{{ database_settings.stdout is not search(primary_log_archive_config_search_str) }}"
-      change_primary_log_archive_dest_1:
-                        "{{ database_settings.stdout is not search(primary_log_archive_dest_1_search_str) }}"
-      change_primary_log_archive_dest_2:
-                        "{{ database_settings.stdout is not search(primary_log_archive_dest_2_search_str) }}"
-      change_primary_log_archive_format:
-                        "{{ database_settings.stdout is not search(primary_log_archive_format_str) }}"
-      change_primary_remote_login_passwordfile:
-                        "{{ database_settings.stdout is not search(primary_remote_login_passwordfile_str) }}"
-      change_primary_fal_server:
-                        "{{ database_settings.stdout is not search(primary_fal_server_str) }}"
-      change_primary_standby_file_management:
-                        "{{ database_settings.stdout is not search(primary_standby_file_management_str) }}"
-    when:               database_settings.stdout is defined
-
-  # ------------------- Create and run fix up script for database settings
-
-  - name:               "Create and run fix up script for database settings"
-    block:
-
-    - name:             "Create database settings fix up script for primary database"
-      template:
-        src:            fix_up_primary_database_settings.j2
-        dest:           /tmp/fix_up_primary_database_settings.sh
-
-    - name:             "Run data guard settings fix up script on primary databse instance"
-      command:          "/bin/bash /tmp/fix_up_primary_database_settings.sh"
-      register:         primary_data_guard_fix_up
-
-    - name:             "Display output from data guard settings fix up script on primary database instance"
-      debug:
-        var:            primary_data_guard_fix_up.stdout_lines
-
-    - name:             "Remove data guard settings fix up script"
-      file:
-        path:           /tmp/fix_up_primary_database_settings.sh
-        state:          absent
-
-    when:               
-    -                   change_primary_force_logging is defined
-    -                   change_primary_force_logging             or 
-                        change_primary_archivelog_mode           or
-                        change_primary_db_unique_name            or
-                        change_primary_log_archive_config        or
-                        change_primary_log_archive_dest_1        or
-                        change_primary_log_archive_dest_2        or
-                        change_primary_log_archive_format        or
-                        change_primary_remote_login_passwordfile or
-                        change_primary_fal_server                or
-                        change_primary_standby_file_management
+  - name:               "Get database status of standby nodes"
+    command:
+      cmd:              "/bin/bash startup_standby_db.sh jar {{ oracle_vars.oracle_home }}"
+      chdir:            "{{ git_repos_sql_ocm12c }}/Data Guard/Create a physical standby database"
+    register:           startup_standby_db
     become:             yes
     become_user:        oracle
-
-  # ------------------- Backup Primary Database for Standby
-
-  - name:               "Backup Primary Database for Standby"
-    block:
-
-    - name:             "Create backup script for primary database"
-      template:
-        src:            backup_primary_database_for_dg.j2
-        dest:           /tmp/backup_primary_database_for_dg.sh
-
-    - name:             "Run backup script on primary databse instance"
-      command:          "/bin/bash /tmp/backup_primary_database_for_dg.sh"
-      register:         primary_data_guard_backup
-      failed_when:      >
-                        ( "RMAN-" in primary_data_guard_backup.stdout ) or
-                        ( "ORA-"  in primary_data_guard_backup.stdout )
-
-    - name:             "Display output from backup script on primary database instance"
-      debug:
-        var:            primary_data_guard_backup.stdout_lines
-      when:             primary_data_guard_backup is defined
-
-    - name:             "Remove primary database backup script"
-      file:
-        path:           /tmp/backup_primary_database_for_dg.sh
-        state:          absent
-
-    become:             yes
-    become_user:        oracle
-
-  when:                 data_guard_config["primary"]["host_name"] == inventory_hostname
-
-  # ------------------- Create Physical Standby Database
-
-- name:                 "Create Physical Standby Database"
-  block:
-
-  - name:               "Create script to build physical standby database"
-    template:
-      src:              restore_standby_database_for_dg.j2
-      dest:             /tmp/restore_standby_database_for_dg.sh
-
-  - name:               "Run script to build physical standby database"
-    command:            "/bin/bash /tmp/restore_standby_database_for_dg.sh"
-    register:           create_standby_data_guard
-    failed_when:        >
-                        ( "RMAN-" in create_standby_data_guard.stdout ) or
-                        ( "ORA-"  in create_standby_data_guard.stdout )
-
-  - name:               "Display output from script to build physical standby database"
+    changed_when:       false
+    failed_when:        false
+  
+  - name:               "Show database status of standby nodes"
     debug:
-      var:              create_standby_data_guard.stdout_lines
-    when:               create_standby_data_guard is defined
-
-  - name:               "Remove script to build physical standby database"
-    file:
-      path:             /tmp/restore_standby_database_for_dg.sh
-      state:            absent
-
-  become:               yes
-  become_user:          oracle
+      var:              startup_standby_db.stdout_lines
+    when:               startup_standby_db is defined
+  
+  - name:               "Show error messages for database status of standby nodes"
+    debug:
+      var:              startup_standby_db.stderr_lines
+    when:               startup_standby_db is defined
+    
   when:                 data_guard_config["standby"]["host_name"] == inventory_hostname
+  
+# --------------------- The physical standby database is rebuilt if the control
+#                       file cannot be found.
 
+- name:                 "Rebuild physical standby database"
+  block:
+  
+  - debug:
+      msg:              "Physical standby database will be rebuilt"
+    
+  - name:               "Ensure there is enough free space for a backup of primary on both primary and standby servers"
+    block:
+    - name:             "Get size of primary database"
+      command:
+        cmd:            "/bin/bash get_database_size.sh jar {{ oracle_vars.oracle_home }}"
+        chdir:          "{{ git_repos_sql_ocm12c }}/Data Guard/Create a physical standby database"
+      register:         primary_db_size
+      become:           yes
+      become_user:      oracle
+      changed_when:     false
+      failed_when:      false
+                        
+    - name:             "Checks if there is enough space for a backup of the database on the primary"
+      fail:
+        msg:            "Insufficient space for a backup of the primary database"
+      when:             primary_db_size.stdout | int > space_available_in_gb | int
+
+    - name:             "Checks if there is enough space for the primary database on the standby"
+      fail:
+        msg:            "Insufficient space for a copy of the primary database"
+      when:             primary_db_size.stdout | int > "hostvars[data_guard_config.standby.host_name].space_available_in_gb" | int
+    
+    when:               data_guard_config.primary.host_name == inventory_hostname
+
+  - import_tasks:       rebuild_standby_db.yml
+    
+  when:                 hostvars[data_guard_config.standby.host_name].startup_standby_db.stderr_lines is search('ORA-00205')
 ...

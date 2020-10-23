@@ -31,4 +31,8 @@ oracleasm_cmd:          "/sbin/oracleasm"
 # --------------------- Most cloning of GITHUB repositories is done via HTTPS
 
 git_hub_access:         "https"
+
+# --------------------- Locations of local GIT repositories
+
+git_repos_sql_ocm12c:   "/home/oracle/sql-ocm12c"
 ...

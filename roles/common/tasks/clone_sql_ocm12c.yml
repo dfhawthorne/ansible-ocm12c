@@ -10,7 +10,7 @@
 - name:                 "Get latest version of SQL Scripts from repository using HTTPS"
   git:
     repo:               "https://github.com/dfhawthorne/sql-ocm12c.git"
-    dest:               "/home/oracle/sql-ocm12c"
+    dest:               "{{ git_repos_sql_ocm12c }}"
     clone:              "yes"
     update:             "yes"
   become:               yes
@@ -20,7 +20,7 @@
 - name:                 "Get latest version of SQL Scripts from repository using GIT"
   git:
     repo:               "git@github.com:dfhawthorne/sql-ocm12c.git"
-    dest:               "/home/oracle/sql-ocm12c"
+    dest:               "{{ git_repos_sql_ocm12c }}"
     clone:              "no"
     update:             "yes"
   become:               yes

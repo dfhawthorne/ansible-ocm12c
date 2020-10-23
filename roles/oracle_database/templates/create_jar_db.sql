@@ -15,13 +15,13 @@ DEFINE pw_system="{{ oracle_pw.SYSTEMPassword }}"
 REM ============================================================================
 REM Create Server Parameter File
 REM ============================================================================
-startup nomount force pfile='/home/oracle/sql-ocm12c/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/OMF initjar.ora'
-CREATE SPFILE FROM pfile='/home/oracle/sql-ocm12c/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/OMF initjar.ora';
+startup nomount force pfile='{{ git_repos_sql_ocm12c }}/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/OMF initjar.ora'
+CREATE SPFILE FROM pfile='{{ git_repos_sql_ocm12c }}/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/OMF initjar.ora';
 startup nomount force
 REM ============================================================================
 REM Create Database using scripts
 REM ============================================================================
-@'/home/oracle/sql-ocm12c/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/Create CDB OMF.sql'
+@'{{ git_repos_sql_ocm12c }}/General Database and Network Administration, and Backup Strategy/Create and manage pluggable databases/Create CDB OMF.sql'
 REM ============================================================================
 REM Enable Log Archiving
 REM ============================================================================
