@@ -69,7 +69,7 @@
   become:               yes
   become_user:          oracle
 
-# --------------------- Get database settings off primary and standby nodes
+# --------------------- Get database settings off primary nodes
 
 - name:                 "Get database settings"
   command:
@@ -79,9 +79,7 @@
   become:               yes
   become_user:          oracle
   changed_when:         false
-  failed_when:          false
-  when:                 data_guard_config["primary"]["host_name"] == inventory_hostname or
-                        data_guard_config["standby"]["host_name"] == inventory_hostname
+  when:                 data_guard_config["primary"]["host_name"] == inventory_hostname
 
 - name:                 "Show database settings"
   debug:
