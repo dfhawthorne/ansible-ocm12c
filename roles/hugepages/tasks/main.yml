@@ -2,6 +2,9 @@
 # tasks file for hugepages
 # ------------------------------------------------------------------------------
 # Sets up Huge Pages for Oracle Enterprise Linux (OEL)
+#
+# SYSCTL errors are ignored. This is a work-around for issue #75. However,
+# this does introduce a potential bug.
 # ------------------------------------------------------------------------------
 
 # --------------------- Use a block to run only for OEL
@@ -30,12 +33,19 @@
     sysctl:
       name:             "vm.nr_hugepages"
       state:            present
-      value:            "{{ num_huge_pages }}"
+      value:            "{{ num_huge_pages | string }}"
       reload:           yes
+      ignoreerrors:     yes
     when:               num_huge_pages is defined
+    notify:             reboot server
 
   when:                 ansible_distribution == 'OracleLinux'
   become:               yes
   become_user:          root
   tags:                 hugepages
+
+# --------------------- Do any scheduled reboots
+
+- name:                 "Reboot server if number of huge pages was changed"
+  meta:                 flush_handlers
 ...

@@ -1,2 +1,7 @@
 ---
 # handlers file for hugepages
+
+- name:                 reboot server
+  reboot:
+
+...
