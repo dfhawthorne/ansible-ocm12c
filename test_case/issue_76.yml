@@ -1,0 +1,16 @@
+---
+- hosts:
+    - localhost
+    - padstow.yaocm.id.au
+  tasks:
+  - name: "Run script without privilege elevation"
+    script:
+      cmd: hello.sh
+      executable: /bin/bash
+  - name: "Run script with privilege elevation"
+    script:
+      cmd: hello.sh
+      executable: /bin/bash
+    become: yes
+    become_user: root
+...
