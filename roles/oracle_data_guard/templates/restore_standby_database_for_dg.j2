@@ -16,7 +16,7 @@ source_host={{ data_guard_config.standby.host_name.split('.')[0] }}
 # ------------------------------------------------------------------------------
 
 {{ oracle_vars.oracle_home }}/bin/sqlplus -S -L / as sysdba <<DONE
-startup nomount pfile='/tmp/init${source_host}.ora'
+startup nomount force pfile='/tmp/init${source_host}.ora'
 create spfile from pfile='/tmp/init${source_host}.ora';
 EXIT
 DONE

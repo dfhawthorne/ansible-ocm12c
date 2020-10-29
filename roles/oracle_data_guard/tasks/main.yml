@@ -84,14 +84,23 @@
         msg:            "Insufficient space for a backup of the primary database"
       when:             primary_db_size.stdout | int > space_available_in_gb | int
 
+    - name:             "Get free space available on standby"
+      set_fact:
+        free_space_available_on_standby:
+                        "{{ hostvars[data_guard_config.standby.host_name].space_available_in_gb | int }}"
+
+    - name:             "Displays size of primary database and free space on standby"
+      debug:
+        msg:            "Primary DB size={{ primary_db_size.stdout | int }}, free space on standby={{ free_space_available_on_standby }}"
+
     - name:             "Checks if there is enough space for the primary database on the standby"
       fail:
         msg:            "Insufficient space for a copy of the primary database"
-      when:             primary_db_size.stdout | int > "hostvars[data_guard_config.standby.host_name].space_available_in_gb" | int
+      when:             primary_db_size.stdout | int > free_space_available_on_standby | int
     
     when:               data_guard_config.primary.host_name == inventory_hostname
 
   - import_tasks:       rebuild_standby_db.yml
     
-  when:                 hostvars[data_guard_config.standby.host_name].startup_standby_db.stderr_lines is search('ORA-00205')
+  when:                 hostvars[data_guard_config.standby.host_name].startup_standby_db.stderr_lines is search('(LRM-00109|ORA-00205|ORA-01078)')
 ...
